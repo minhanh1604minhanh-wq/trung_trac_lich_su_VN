@@ -40,6 +40,18 @@ Mở `http://localhost:3000`; kiểm tra `http://localhost:3000/health`.
 
 `API_BASE_URL` mặc định để trống vì frontend và backend chạy cùng domain. Không đưa file `.env` hoặc API key thật lên GitHub.
 
+
+## Thông tin người tham gia
+
+- Trước khi bắt đầu, người dùng phải nhập **Tên người tham gia**. Trường này là bắt buộc; website không tự thay bằng “Người học”.
+- `Lớp` và `Trường` là tùy chọn.
+- Ba giá trị chỉ được giữ trong trạng thái của phiên hiện tại và có thể lấy qua `participantSnapshot()` khi tích hợp hệ thống thống kê trung tâm sau này. Không lưu dai dẳng tên/lớp/trường trên máy kiosk.
+- Bản này vẫn **không có Google Sheets** và chưa gửi dữ liệu người tham gia ra ngoài website.
+
+## Giao diện dock
+
+- Đã xóa pseudo-element `.tool-card::after`, là vòng tròn mờ trang trí ở góc dưới-phải của thẻ chức năng. Icon tròn thực sự của từng công cụ (`.tool-medallion`) vẫn được giữ nguyên.
+
 ## Nhập vai quyết sách
 
 - Khi chưa có tình huống, nút hiển thị `Bắt đầu tình huống`.

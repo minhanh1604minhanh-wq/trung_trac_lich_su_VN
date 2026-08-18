@@ -1,29 +1,77 @@
-VALIDATION REPORT — TRƯNG TRẮC v5.8.2
-Ngày kiểm tra: 2026-08-18
+TRUNG TRAC v5.8.3 — VALIDATION REPORT
+Date: 2026-08-18
 
-KẾT QUẢ
-- npm run validate: PASS 54/54.
-- node --check public/app.js: PASS.
-- node --check server.js: PASS.
-- Endpoint runtime: PASS cho /health, /ask, /whatif, /roleplay, /speak.
-- Endpoint lưu báo cáo ngoài: đã loại bỏ.
-- JSON và liên kết sourceIds: PASS.
-- ID JavaScript so với HTML: PASS, không thiếu và không trùng.
-- Slug, title, alt, đường dẫn mô hình/audio và tên PDF: PASS.
-- Tra cứu AI: phần giọng đọc chỉ lấy trường reply.
-- Giả định lịch sử: giọng đọc nêu đủ bốn nhãn trước nội dung.
-- Câu hỏi mới: dừng audio, hủy request và xóa kết quả cũ trước khi gửi.
-- Nhập vai: nút đổi sang “Bắt đầu tình huống mới” khi tình huống đã hoạt động; bấm lại reset lịch sử, lượt, lựa chọn, nhận xét, kết quả và chỉ số mô phỏng trước khi tạo tình huống mới.
-- Chỉ số mô phỏng: hiển thị định tính; baseline lượt đầu Quân sự Khá, Ngoại giao Trung bình, Lòng dân Tốt, Hậu cần Trung bình, Chính trị Khá, Quản trị Trung bình.
-- Nút đóng panel: giữ dấu X và chức năng đóng, bỏ nền/border/vòng tròn trang trí.
-- Responsive: các breakpoint mobile của mẫu được giữ nguyên; kiểm tra tĩnh PASS.
-- API key: chỉ đọc từ process.env.OPENAI_API_KEY; .env.example không chứa khóa thật.
+node --check public/app.js: PASS
+node --check server.js: PASS
 
-ASSET
-- GLB: giữ nguyên file trung_trac.glb.
-- Audio VI: giữ nguyên file trung_trac_tieng_viet.mp3.
-- Audio EN: giữ nguyên file trung_trac_tieng_anh.mp3.
 
-GHI CHÚ
-- ZIP không chứa node_modules, .env hoặc API key.
-- GitHub/Vercel cài dependency từ package.json khi build.
+> trung-trac-history-museum@5.8.3 validate
+> node validate-project.js
+
+PASS (60)
+✓ JSON hợp lệ
+✓ Slug nhân vật
+✓ Tên VI/EN
+✓ Ít nhất 6 mục hồ sơ
+✓ Timeline ít nhất 6 mốc
+✓ Facts nền hiện diện
+✓ Nhập vai tối đa 6 lượt
+✓ Nhập vai đúng nhân vật
+✓ Baseline chỉ số mô phỏng đúng
+✓ Mọi mục lịch sử có sourceIds
+✓ Mọi sourceId đều tồn tại
+✓ Metadata lịch sử có sourceIds
+✓ Intro và màn bụi có nguồn
+✓ Hồ sơ song ngữ
+✓ Timeline song ngữ
+✓ Facts song ngữ
+✓ Gợi ý VI/EN
+✓ URL nguồn chỉ thuộc whitelist
+✓ Asset tồn tại: public/assets/trung_trac.glb
+✓ Asset tồn tại: public/assets/trung_trac_tieng_viet.mp3
+✓ Asset tồn tại: public/assets/trung_trac_tieng_anh.mp3
+✓ GLB magic glTF
+✓ GLB version 2
+✓ GLB length hợp lệ
+✓ MP3 hợp lệ: public/assets/trung_trac_tieng_viet.mp3
+✓ MP3 hợp lệ: public/assets/trung_trac_tieng_anh.mp3
+✓ HTML không trùng ID
+✓ Mọi ID JS đều có trong HTML
+✓ DEFAULT_CHARACTER_ID đúng
+✓ API_BASE_URL cùng domain
+✓ Endpoint /health
+✓ Endpoint /ask
+✓ Endpoint /whatif
+✓ Endpoint /roleplay
+✓ Endpoint /speak
+✓ Không còn endpoint lưu báo cáo ngoài
+✓ Tên người tham gia bắt buộc
+✓ Lớp và trường tùy chọn
+✓ Thông tin người tham gia sẵn sàng cho analytics
+✓ Không lưu dai dẳng thông tin cá nhân trên kiosk
+✓ Không còn vòng tròn trang trí tool-card
+✓ Không còn Google Sheets runtime
+✓ Nút nhập vai có trạng thái tình huống mới
+✓ Tình huống mới reset lịch sử và lượt
+✓ Chỉ số mô phỏng dùng nhãn định tính
+✓ Nút đóng không còn vòng tròn
+✓ OpenAI key chỉ ở backend
+✓ Câu mới hủy request cũ
+✓ Câu mới xóa kết quả cũ
+✓ Tra cứu chỉ đọc reply
+✓ Tốc độ audio AI 1.08
+✓ Không fallback giọng Anh cho VI
+✓ Giả định đọc nhãn: Mốc có thật
+✓ Giả định đọc nhãn: Điều kiện thay đổi
+✓ Giả định đọc nhãn: Hệ quả có thể
+✓ Giả định đọc nhãn: Điểm bất định
+✓ Responsive mobile còn nguyên
+✓ PDF filename theo slug
+✓ Không còn dấu vết nhân vật mẫu
+✓ .env.example không chứa khóa thật
+
+Runtime Google Sheets references (expected none):
+NONE
+
+Decorative tool-card circle rule (expected none):
+NONE

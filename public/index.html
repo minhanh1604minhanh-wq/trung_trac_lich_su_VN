@@ -93,11 +93,16 @@
       <h1 id="introName">TRƯNG TRẮC</h1>
       <p id="introText">Đang tải hồ sơ…</p>
       <div id="introMeta" class="meta-row"></div>
-      <label id="nameLabel" for="playerName">Tên người khám phá</label>
+      <label id="nameLabel" for="playerName">Tên người tham gia <span class="required-mark" aria-hidden="true">*</span></label>
       <div class="start-row">
-        <input id="playerName" maxlength="40" autocomplete="name" placeholder="Nhập tên của bạn…">
+        <input id="playerName" maxlength="60" autocomplete="name" required aria-required="true" placeholder="Nhập họ và tên…">
         <button id="startBtn" class="btn primary" type="button">Bắt đầu khám phá</button>
       </div>
+      <div class="participant-optional-grid">
+        <label class="participant-field" for="playerClass"><span id="classLabel">Lớp <small>(không bắt buộc)</small></span><input id="playerClass" maxlength="40" autocomplete="organization-title" placeholder="Ví dụ: 10A1"></label>
+        <label class="participant-field" for="playerSchool"><span id="schoolLabel">Trường <small>(không bắt buộc)</small></span><input id="playerSchool" maxlength="100" autocomplete="organization" placeholder="Tên trường"></label>
+      </div>
+      <p id="participantError" class="participant-error" role="alert" aria-live="polite"></p>
       <button id="introLangBtn" class="link-btn" type="button">English</button>
     </div>
   </section>

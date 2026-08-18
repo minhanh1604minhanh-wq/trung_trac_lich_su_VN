@@ -1,21 +1,30 @@
-FULL PROJECT MANIFEST — TRƯNG TRẮC
+TRUNG_TRAC_FULL — v5.8.3 PARTICIPANT READY / NO SHEETS
 
-.env.example
-.gitignore
-FULL_PROJECT_MANIFEST.txt
-MASTER_PROMPT_NEXT_CHARACTER.txt
-README.md
-SOURCE_POLICY.md
-package.json
-server.js
-vercel.json
-VALIDATION_REPORT.txt
-validate-project.js
-public/index.html
-public/styles.css
-public/app.js
-public/config.js
-public/data/trung-trac.json
-public/assets/trung_trac.glb
-public/assets/trung_trac_tieng_viet.mp3
-public/assets/trung_trac_tieng_anh.mp3
+Core:
+- server.js
+- package.json
+- vercel.json
+- .env.example
+- README.md
+- SOURCE_POLICY.md
+- validate-project.js
+
+Frontend:
+- public/index.html
+- public/styles.css
+- public/app.js
+- public/config.js
+- public/data/trung-trac.json
+
+Assets:
+- public/assets/trung_trac.glb
+- public/assets/trung_trac_tieng_viet.mp3
+- public/assets/trung_trac_tieng_anh.mp3
+
+Participant fields:
+- name: required
+- class: optional
+- school: optional
+
+Google Sheets: removed
+Decorative tool-card corner circle: removed
