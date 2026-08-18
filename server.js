@@ -91,7 +91,18 @@ app.post('/roleplay',async(req,res)=>{
     if(turn>=maxTurns)d.isGameOver=true;
     if(d.isGameOver)d.choices=[];
     else{
-      d.choices=Array.isArray(d.choices)?d.choices.filter(Boolean).slice(0,3):[];
+      d.choices = Array.isArray(d.choices)
+        ? d.choices
+            .map(c => {
+              if (typeof c === 'string') return c.trim();
+              if (c && typeof c === 'object') {
+                return clean(c.text || c.label || c.choice || c.action || c.title || '', 500);
+              }
+              return '';
+            })
+            .filter(Boolean)
+            .slice(0, 3)
+        : [];
       while(d.choices.length<3)d.choices.push(en?`Reassess the situation before action ${d.choices.length+1}`:`Đánh giá lại tình hình trước phương án ${d.choices.length+1}`);
     }
     res.json(d);

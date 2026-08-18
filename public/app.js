@@ -411,7 +411,20 @@ async function roleTurn(choice=null){
       $('roleResult').innerHTML+=`<hr><p><b>${state.lang==='vi'?'Tổng kết':'Summary'}:</b> ${esc(d.endReason||'')}</p>`;
       $('roleExportBtn').classList.remove('hidden');saveInteraction('Nhập vai quyết sách',state.roleHistory);renderJourney();
     }else{
-      (d.choices||[]).forEach(c=>{const b=document.createElement('button');b.className='choice-btn';b.textContent=c;b.onclick=()=>{state.roleTurn++;roleTurn(c)};$('roleChoices').appendChild(b)});
+      (d.choices || []).forEach(c => {
+        const text = typeof c === 'string'
+          ? c
+          : (c?.text || c?.label || c?.choice || c?.action || c?.title || '');
+        if (!text) return;
+        const b = document.createElement('button');
+        b.className = 'choice-btn';
+        b.textContent = text;
+        b.onclick = () => {
+          state.roleTurn++;
+          roleTurn(text);
+        };
+        $('roleChoices').appendChild(b);
+      });
     }
     $('roleStatus').textContent=t('done');
     void preparedSpeech.start();
