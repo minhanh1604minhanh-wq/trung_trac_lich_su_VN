@@ -1,5 +1,5 @@
 MẪU CHUYỂN NHÂN VẬT TIẾP THEO
 
-Dùng ZIP FULL Trưng Trắc này làm mẫu. Giữ nguyên giao diện, SVG, animation, màn bụi, 3D, responsive, audio, microphone, PDF, Google Sheets, backend Express và Vercel. Chỉ thay nội dung/asset phụ thuộc nhân vật.
+Dùng ZIP FULL Trưng Trắc này làm mẫu. Giữ nguyên giao diện, SVG, animation, màn bụi, 3D, responsive, audio, microphone, PDF, backend Express và Vercel. Chỉ thay nội dung/asset phụ thuộc nhân vật.
 
 Bắt buộc khóa AI vào facts có sourceId; phân biệt dữ kiện, nhận định, truyền thuyết, tranh luận và mô phỏng; xóa mọi hard-code của nhân vật trước; không đóng gói API key.

@@ -85,9 +85,19 @@ app.post('/roleplay',async(req,res)=>{
   try{
     const rp=p.roleplay||{};
     const en=lang==='en';
-    const prompt=`${curatedContext(p,lang)}\n${en?'Write entirely in English.':'Viết hoàn toàn bằng tiếng Việt.'}\nHISTORICAL DECISION ROLE-PLAY. ${en?rp.learnerRole?.en:rp.learnerRole?.vi}\nSETTING: ${en?rp.setting?.en:rp.setting?.vi}\nOPENING PROBLEM: ${en?rp.opening?.en:rp.opening?.vi}\nFACTORS: ${(en?rp.evaluationFactors?.en:rp.evaluationFactors?.vi||[]).join(', ')}\nRULES: ${en?rp.rules?.en:rp.rules?.vi}\nThis is turn ${turn}/${maxTurns}. Return JSON exactly with keys: npcDialogue, feedback, evaluation (object with military, diplomacy, publicSupport, logistics, politics, governance), sourceIds, choices, isGameOver, endReason. Source IDs may support only real background stated in npcDialogue or feedback. Clearly label simulated consequences as simulation. Unless game over, choices must contain exactly 3 distinct actionable options. End no later than turn ${maxTurns}.`;
+    const prompt=`${curatedContext(p,lang)}\n${en?'Write entirely in English.':'Viết hoàn toàn bằng tiếng Việt.'}\nHISTORICAL DECISION ROLE-PLAY. ${en?rp.learnerRole?.en:rp.learnerRole?.vi}\nSETTING: ${en?rp.setting?.en:rp.setting?.vi}\nOPENING PROBLEM: ${en?rp.opening?.en:rp.opening?.vi}\nFACTORS: ${(en?rp.evaluationFactors?.en:rp.evaluationFactors?.vi||[]).join(', ')}\nRULES: ${en?rp.rules?.en:rp.rules?.vi}\nThis is turn ${turn}/${maxTurns}. Return JSON exactly with keys: npcDialogue, feedback, evaluation (object with military, diplomacy, publicSupport, logistics, politics, governance), sourceIds, choices, isGameOver, endReason. Every evaluation value must be an integer from 1 to 5 and is only a SIMULATION INDICATOR, never a historical fact. On turn 1 use the configured baseline evaluation exactly. On later turns, change scores only when justified by the learner's simulated choice and normally by at most 1 point per factor. Source IDs may support only real background stated in npcDialogue or feedback; never attach historical sources to the simulated scores themselves. Clearly label simulated consequences as simulation. Unless game over, choices must contain exactly 3 distinct actionable options. End no later than turn ${maxTurns}.`;
     const d=await jsonChat([{role:'system',content:prompt},...hist(req.body.history)],.55);
     d.sourceIds=filterSourceIds(p,d.sourceIds);
+    const defaultEvaluation={military:3,diplomacy:2,publicSupport:4,logistics:2,politics:3,governance:2};
+    const configuredEvaluation=rp.initialEvaluation&&typeof rp.initialEvaluation==='object'?rp.initialEvaluation:{};
+    const baselineEvaluation=Object.fromEntries(Object.keys(defaultEvaluation).map(k=>[k,Number.isFinite(Number(configuredEvaluation[k]))?Math.max(1,Math.min(5,Math.round(Number(configuredEvaluation[k])))):defaultEvaluation[k]]));
+    const normalizeScore=v=>{const n=Number(v);return Number.isFinite(n)?Math.max(1,Math.min(5,Math.round(n))):3};
+    if(turn===1){
+      d.evaluation={...baselineEvaluation};
+    }else{
+      const raw=d.evaluation&&typeof d.evaluation==='object'?d.evaluation:{};
+      d.evaluation=Object.fromEntries(Object.keys(baselineEvaluation).map(k=>[k,normalizeScore(raw[k]) ]));
+    }
     if(turn>=maxTurns)d.isGameOver=true;
     if(d.isGameOver)d.choices=[];
     else{
@@ -125,14 +135,6 @@ app.post('/speak',async(req,res)=>{
   }catch(e){res.status(500).end()}
 });
 
-app.post('/save-report',async(req,res)=>{
-  const url=process.env.GOOGLE_SHEET_URL;
-  if(!url)return res.json({success:false,message:'GOOGLE_SHEET_URL missing'});
-  try{
-    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(req.body),redirect:'follow'});
-    res.json({success:r.ok});
-  }catch(e){res.status(502).json({success:false})}
-});
 
 app.use(express.static(PUBLIC,{index:'index.html',setHeaders(res,file){if(file.endsWith('.glb'))res.setHeader('Content-Type','model/gltf-binary')}}));
 app.use((req,res)=>res.status(404).json({message:'Not found'}));

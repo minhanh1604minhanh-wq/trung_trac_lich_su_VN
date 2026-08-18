@@ -657,6 +657,14 @@
         "governance"
       ]
     },
+    "initialEvaluation": {
+      "military": 3,
+      "diplomacy": 2,
+      "publicSupport": 4,
+      "logistics": 2,
+      "politics": 3,
+      "governance": 2
+    },
     "rules": {
       "vi": "Mỗi lượt chưa kết thúc phải có đúng 3 lựa chọn. Nguồn chỉ gắn cho bối cảnh có thật; mọi hệ quả do lựa chọn tạo ra phải ghi rõ là mô phỏng.",
       "en": "Each unfinished turn must offer exactly three choices. Sources may support only real background; all consequences created by choices must be labelled as simulation."

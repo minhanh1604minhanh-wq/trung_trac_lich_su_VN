@@ -1,6 +1,6 @@
 {
   "name": "trung-trac-history-museum",
-  "version": "1.0.0",
+  "version": "5.8.2",
   "private": true,
   "main": "server.js",
   "scripts": {
