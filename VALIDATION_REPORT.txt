@@ -1,0 +1,28 @@
+VALIDATION REPORT — TRƯNG TRẮC
+Ngày kiểm tra: 2026-08-18
+
+KẾT QUẢ
+- npm run validate: PASS 49/49.
+- node --check public/app.js: PASS.
+- node --check server.js: PASS.
+- Route registration: PASS cho /health, /ask, /whatif, /roleplay, /speak, /save-report.
+- /health handler: PASS, trả {"ok":true,"character":"trung-trac","aiReady":false} khi chưa đặt API key.
+- JSON và liên kết sourceIds: PASS.
+- ID JavaScript so với HTML: PASS, không thiếu và không trùng.
+- Slug, title, alt, đường dẫn mô hình/audio và tên PDF: PASS.
+- Chuỗi legacy runtime: không còn.
+- Tra cứu AI: phần giọng đọc chỉ lấy trường reply.
+- Giả định lịch sử: giọng đọc nêu đủ bốn nhãn trước nội dung.
+- Câu hỏi mới: dừng audio, hủy request và xóa kết quả cũ trước khi gửi.
+- Responsive: các breakpoint 900/640/420/390 px của mẫu được giữ nguyên; kiểm tra tĩnh PASS.
+- API key: chỉ đọc từ process.env.OPENAI_API_KEY; .env.example không chứa khóa thật.
+- Số file project tại thời điểm kiểm tra: 19.
+
+ASSET
+- GLB: 56896312 bytes; glTF binary version 2; SHA-256 21806589f02eb55efa6bfe107c60c446bed06952265fdda6bc02828e89e9efa3
+- Audio VI: 1288395 bytes; 81.502s; SHA-256 06c43ada03a7b2ccb9441ced5f4630a2ba5358a5b42cbae6369143cee97c6293
+- Audio EN: 583920 bytes; 97.320s; SHA-256 ead824ae659d663b75111b007eefdbf16d347230bbd89a781e7ea986b91e31e5
+
+GHI CHÚ MÔI TRƯỜNG KIỂM TRA
+- Sandbox không hoàn tất được npm install do truy cập registry bị giới hạn. Vì vậy smoke test route dùng module stub cục bộ chỉ để kiểm tra đăng ký endpoint và payload /health.
+- ZIP không chứa node_modules, .env hoặc API key. GitHub/Vercel sẽ cài dependency từ package.json khi build.

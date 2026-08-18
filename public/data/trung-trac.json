@@ -1,0 +1,665 @@
+{
+  "id": "trung-trac",
+  "name": "Trưng Trắc",
+  "nameEn": "Trung Trac",
+  "period": "Giao Chỉ • thế kỷ I • chính quyền Trưng Vương",
+  "periodEn": "Jiaozhi • 1st century • the Trung polity",
+  "years": "Không rõ – 43?",
+  "yearsEn": "Unknown – 43?",
+  "reign": "40–43 (cách ghi phổ biến); Toàn thư chép 3 năm 40–42",
+  "reignEn": "40–43 (common chronology); the Complete Annals counts 40–42",
+  "dynasty": "Chính quyền Trưng Vương",
+  "dynastyEn": "Trung polity",
+  "capital": "Mê Linh (theo Đại Việt sử ký toàn thư)",
+  "capitalEn": "Me Linh (according to the Complete Annals)",
+  "metadataEvidence": {
+    "name": {
+      "sourceIds": [
+        "S1",
+        "S5"
+      ],
+      "evidenceType": "historical_name"
+    },
+    "period": {
+      "sourceIds": [
+        "S1",
+        "S4"
+      ],
+      "evidenceType": "historical_context"
+    },
+    "years": {
+      "sourceIds": [
+        "S1",
+        "S5",
+        "S6"
+      ],
+      "evidenceType": "uncertain_and_disputed"
+    },
+    "reign": {
+      "sourceIds": [
+        "S1",
+        "S5"
+      ],
+      "evidenceType": "chronology_with_variant"
+    },
+    "dynasty": {
+      "sourceIds": [
+        "S1",
+        "S4"
+      ],
+      "evidenceType": "historical_context"
+    },
+    "capital": {
+      "sourceIds": [
+        "S1"
+      ],
+      "evidenceType": "chronicle_record"
+    },
+    "model": {
+      "sourceIds": [],
+      "evidenceType": "user_supplied_asset"
+    },
+    "narration": {
+      "sourceIds": [],
+      "evidenceType": "user_supplied_asset"
+    }
+  },
+  "model": "./assets/trung_trac.glb",
+  "narration": {
+    "vi": "./assets/trung_trac_tieng_viet.mp3",
+    "en": "./assets/trung_trac_tieng_anh.mp3"
+  },
+  "intro": {
+    "vi": "Khám phá Trưng Trắc qua mô hình 3D, hồ sơ có phân loại chứng cứ, tra cứu sử liệu, giả định lịch sử và nhập vai quyết sách.",
+    "en": "Explore Trung Trac through a 3D model, an evidence-labelled profile, historical inquiry, counterfactual analysis and decision role-play.",
+    "sourceIds": [
+      "S1",
+      "S3",
+      "S4",
+      "S5",
+      "S6"
+    ],
+    "evidenceType": "editorial_summary"
+  },
+  "dustSecret": {
+    "vi": "Năm 40, một cuộc nổi dậy do Trưng Trắc và Trưng Nhị lãnh đạo đã làm thay đổi cục diện Giao Chỉ. Một số chi tiết quen thuộc về cuộc đời hai bà vẫn còn khác nhau giữa chính sử, nghiên cứu và truyền thống.",
+    "en": "In 40 CE, an uprising led by Trung Trac and Trung Nhi transformed the political situation in Jiaozhi. Several familiar details of their lives still differ across chronicles, scholarship and tradition.",
+    "sourceIds": [
+      "S1",
+      "S3",
+      "S5",
+      "S6"
+    ],
+    "evidenceType": "historical_fact_and_dispute"
+  },
+  "qaPlaceholder": {
+    "vi": "Ví dụ: Trưng Trắc xưng vương trong bối cảnh nào?",
+    "en": "Example: In what context did Trung Trac proclaim herself ruler?"
+  },
+  "whatifPlaceholder": {
+    "vi": "Ví dụ: Nếu lực lượng Trưng Vương giữ được tuyến Lãng Bạc thì sao?",
+    "en": "Example: What if the Trung forces had held the Lang Bac line?"
+  },
+  "profileSections": [
+    {
+      "title": "Thân thế: điều có thể xác nhận",
+      "titleEn": "Origins: what can be established",
+      "body": "Đại Việt sử ký toàn thư chép Trưng Trắc vốn thuộc dòng Lạc tướng ở huyện Mê Linh và là chị của Trưng Nhị. Năm sinh của bà không được các nguồn được phép trong dự án xác nhận chắc chắn, vì vậy hồ sơ ghi “không rõ”.",
+      "bodyEn": "The Complete Annals of Dai Viet records Trung Trac as belonging to the line of a Lac leader in Me Linh and as the elder sister of Trung Nhi. Her birth year is not securely established by the permitted sources used in this project, so the profile marks it as unknown.",
+      "sources": [
+        "S1",
+        "S5"
+      ],
+      "evidenceType": "historical_fact",
+      "sourceIds": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "title": "Bối cảnh cai trị và nguyên nhân nổi dậy",
+      "titleEn": "Rule and causes of the uprising",
+      "body": "Toàn thư mô tả Trưng Trắc chịu sự ràng buộc bởi pháp luật của Thái thú Tô Định. Nghiên cứu chuyên đề nhấn mạnh thêm xung đột giữa cơ chế cai trị quận huyện của Đông Hán với xã hội Lạc Việt. Đây là cách giải thích lịch sử; không nên thu gọn toàn bộ nguyên nhân chỉ thành một động cơ cá nhân.",
+      "bodyEn": "The Complete Annals describes Trung Trac as suffering under the restrictive rule of Governor Su Ding. Specialist discussion further stresses conflict between Eastern Han commandery administration and Lac Viet society. This is a historical interpretation; the uprising should not be reduced to a single personal motive.",
+      "sources": [
+        "S1",
+        "S4"
+      ],
+      "evidenceType": "historical_fact_and_interpretation",
+      "sourceIds": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "title": "Tên và số phận của người chồng: điểm còn tranh luận",
+      "titleEn": "Her husband's name and fate: a disputed point",
+      "body": "Đại Việt sử ký toàn thư gọi chồng bà là Thi Sách và chép Tô Định giết ông. Một bài nghiên cứu trên Nghiên Cứu Lịch Sử cho rằng cách ngắt câu cổ có thể khiến tên đúng chỉ là “Thi”, đồng thời đặt lại vấn đề ông có bị giết trước khởi nghĩa hay không. Website trình bày hai cách đọc, không chọn một cách làm sự thật tuyệt đối.",
+      "bodyEn": "The Complete Annals calls her husband Thi Sach and states that Su Ding killed him. A study published by Nghien Cuu Lich Su argues that the ancient wording may indicate that his name was simply Thi and also questions whether he was killed before the uprising. The site presents both readings without turning either into an unquestioned fact.",
+      "sources": [
+        "S1",
+        "S3"
+      ],
+      "evidenceType": "disputed",
+      "sourceIds": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "title": "Khởi nghĩa năm 40 và việc xưng vương",
+      "titleEn": "The uprising of 40 CE and proclamation of rule",
+      "body": "Toàn thư chép mùa xuân năm 40, Trưng Trắc cùng Trưng Nhị nổi binh, đánh hãm trị sở, khiến Tô Định chạy về phương Bắc. Sử này ghi các vùng Cửu Chân, Nhật Nam, Hợp Phố hưởng ứng, 65 thành ở Lĩnh Nam được thu phục, và Trưng Trắc tự lập làm vua.",
+      "bodyEn": "The Complete Annals records that in spring 40 CE, Trung Trac and Trung Nhi rose in arms, took the administrative seat and forced Su Ding to flee north. It states that Cuu Chan, Nhat Nam and Hop Pho responded, that 65 cities in Lingnan were taken, and that Trung Trac established herself as ruler.",
+      "sources": [
+        "S1",
+        "S5"
+      ],
+      "evidenceType": "historical_fact_in_chronicle",
+      "sourceIds": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "title": "Mê Linh và chính quyền Trưng Vương",
+      "titleEn": "Me Linh and the Trung polity",
+      "body": "Toàn thư ghi Trưng Trắc đóng đô ở Mê Linh và ở ngôi ba năm. Các nguồn được phép chưa đủ để tái dựng chắc chắn cơ cấu quan chức, chính sách thuế hay toàn bộ ranh giới kiểm soát của chính quyền này. Với các chi tiết đó, hệ thống phải trả lời: “Chưa đủ nguồn để khẳng định.”",
+      "bodyEn": "The Complete Annals places Trung Trac's capital at Me Linh and gives her a three-year reign. The permitted sources are insufficient to securely reconstruct the polity's full official structure, tax policies or exact boundaries. For such details, the system must state that the evidence is insufficient to confirm them.",
+      "sources": [
+        "S1"
+      ],
+      "evidenceType": "historical_fact_and_limit",
+      "sourceIds": [
+        "S1"
+      ]
+    },
+    {
+      "title": "Cuộc phản công của Đông Hán",
+      "titleEn": "The Eastern Han counteroffensive",
+      "body": "Toàn thư chép năm 41 nhà Hán chuẩn bị xe thuyền, cầu đường và lương thực, cử Mã Viện làm Phục Ba tướng quân, Lưu Long làm phó. Năm 42, quân Mã Viện đến Lãng Bạc; lực lượng Trưng Vương rút về Cấm Khê và chính quyền mất thế kiểm soát.",
+      "bodyEn": "The Complete Annals records that in 41 CE the Han prepared transport, roads and grain, appointing Ma Yuan as General Fubo with Liu Long as deputy. In 42, Ma Yuan's army reached Lang Bac; the Trung forces withdrew toward Cam Khe and the polity lost control.",
+      "sources": [
+        "S1",
+        "S5"
+      ],
+      "evidenceType": "historical_fact_in_chronicle",
+      "sourceIds": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "title": "Năm mất và cách kể về cái chết",
+      "titleEn": "Date and accounts of her death",
+      "body": "Niên đại phổ biến đặt thất bại cuối cùng và cái chết của hai bà vào năm 43. Người Kể Sử tổng hợp rằng truyền thống kể hai bà trầm mình ở sông Hát, trong khi một cách ghi từ sử liệu Đông Hán nói hai bà bị giết; Toàn thư kết thúc kỷ Trưng Nữ Vương ở năm 42 mà không kể chuyện trầm mình trong đoạn biên niên này. Vì vậy, việc “trầm mình năm 43” phải được gắn nhãn truyền thống, không phải chi tiết hoàn toàn thống nhất.",
+      "bodyEn": "The commonly used chronology places the final defeat and the sisters' deaths in 43 CE. Nguoi Ke Su summarizes a tradition in which they drowned themselves in the Hat River, while an Eastern Han account says they were killed; the Complete Annals ends the Trung reign in 42 without narrating the drowning in this annalistic passage. Therefore, 'drowning in 43' must be labelled as tradition rather than a fully agreed fact.",
+      "sources": [
+        "S1",
+        "S5",
+        "S6"
+      ],
+      "evidenceType": "disputed_and_tradition",
+      "sourceIds": [
+        "S1",
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "title": "Nhận định của sử gia và ký ức hậu thế",
+      "titleEn": "Historians' judgement and later memory",
+      "body": "Lời bàn của Lê Văn Hưu trong Toàn thư ca ngợi khả năng tập hợp lực lượng và việc dựng nước xưng vương của hai chị em. Đây là nhận định của sử gia đời sau, không phải một dữ kiện sự kiện. Hình tượng Trưng Trắc trong ký ức dân tộc còn được bồi đắp bởi truyền thuyết; các chi tiết truyền thuyết không được dùng thay cho chính sử.",
+      "bodyEn": "Le Van Huu's commentary in the Complete Annals praises the sisters' ability to rally support and establish rule. This is a later historian's judgement, not an event-level fact. Trung Trac's place in national memory was also shaped by legend; legendary details must not replace chronicle evidence.",
+      "sources": [
+        "S1",
+        "S6"
+      ],
+      "evidenceType": "author_judgement_and_reception",
+      "sourceIds": [
+        "S1",
+        "S6"
+      ]
+    }
+  ],
+  "timeline": [
+    {
+      "year": "Không rõ",
+      "vi": "Năm sinh của Trưng Trắc chưa được các nguồn được phép xác nhận chắc chắn.",
+      "en": "Trung Trac's birth year is not securely established by the permitted sources.",
+      "sources": [
+        "S1",
+        "S5"
+      ],
+      "evidenceType": "uncertain",
+      "sourceIds": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "year": "Trước 40",
+      "vi": "Toàn thư ghi bà là con gái dòng Lạc tướng Mê Linh và là vợ Thi Sách ở Chu Diên; cách đọc tên người chồng còn tranh luận.",
+      "en": "The Complete Annals presents her as a daughter of the Lac leadership of Me Linh and wife of Thi Sach of Chu Dien; the husband's name remains disputed.",
+      "sources": [
+        "S1",
+        "S3"
+      ],
+      "evidenceType": "fact_and_dispute",
+      "sourceIds": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "year": "40",
+      "vi": "Trưng Trắc và Trưng Nhị nổi binh, đánh hãm trị sở và khiến Tô Định bỏ chạy.",
+      "en": "Trung Trac and Trung Nhi rose in arms, captured the administrative seat and forced Su Ding to flee.",
+      "sources": [
+        "S1",
+        "S5"
+      ],
+      "evidenceType": "historical_fact",
+      "sourceIds": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "year": "40",
+      "vi": "Toàn thư chép phong trào được nhiều quận hưởng ứng, thu phục 65 thành; Trưng Trắc tự lập làm vua và đóng đô ở Mê Linh.",
+      "en": "The Complete Annals records support from several commanderies, the capture of 65 cities, and Trung Trac's proclamation as ruler with her capital at Me Linh.",
+      "sources": [
+        "S1"
+      ],
+      "evidenceType": "chronicle_record",
+      "sourceIds": [
+        "S1"
+      ]
+    },
+    {
+      "year": "41",
+      "vi": "Nhà Đông Hán chuẩn bị đường sá, xe thuyền và lương thực, cử Mã Viện và Lưu Long tiến quân.",
+      "en": "The Eastern Han prepared roads, transport and supplies, sending Ma Yuan and Liu Long.",
+      "sources": [
+        "S1"
+      ],
+      "evidenceType": "historical_fact",
+      "sourceIds": [
+        "S1"
+      ]
+    },
+    {
+      "year": "42",
+      "vi": "Quân Trưng Vương giao chiến tại Lãng Bạc rồi lui về Cấm Khê; Toàn thư ghi quốc thống lại mất.",
+      "en": "The Trung forces fought at Lang Bac and withdrew toward Cam Khe; the Complete Annals states that the polity was lost.",
+      "sources": [
+        "S1"
+      ],
+      "evidenceType": "chronicle_record",
+      "sourceIds": [
+        "S1"
+      ]
+    },
+    {
+      "year": "43?",
+      "vi": "Niên đại và kết cục cuối đời thường được đặt ở năm 43, nhưng cách kể về cái chết khác nhau giữa truyền thống và các sử liệu được tổng hợp.",
+      "en": "The final defeat and death are commonly dated to 43, but accounts of the death differ between tradition and the historical records summarized by the sources.",
+      "sources": [
+        "S5",
+        "S6"
+      ],
+      "evidenceType": "disputed",
+      "sourceIds": [
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "year": "Hậu thế",
+      "vi": "Lê Văn Hưu ca ngợi khí thế tập hợp lực lượng của hai bà; đây là lời bình của sử gia đời sau.",
+      "en": "Le Van Huu praised the sisters' power to rally support; this is a later historian's judgement.",
+      "sources": [
+        "S1"
+      ],
+      "evidenceType": "author_judgement",
+      "sourceIds": [
+        "S1"
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "id": "F1",
+      "kind": "historical_fact",
+      "vi": "Trưng Trắc là chị của Trưng Nhị và được Toàn thư đặt trong dòng Lạc tướng ở Mê Linh.",
+      "en": "Trung Trac was the elder sister of Trung Nhi and is placed by the Complete Annals in the Lac leadership lineage of Me Linh.",
+      "sources": [
+        "S1"
+      ],
+      "sourceIds": [
+        "S1"
+      ]
+    },
+    {
+      "id": "F2",
+      "kind": "uncertain",
+      "vi": "Năm sinh của Trưng Trắc chưa được bộ nguồn được phép xác nhận.",
+      "en": "Trung Trac's birth year is not established by the permitted source set.",
+      "sources": [
+        "S1",
+        "S5"
+      ],
+      "sourceIds": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "id": "F3",
+      "kind": "disputed",
+      "vi": "Toàn thư gọi chồng bà là Thi Sách; một nghiên cứu cho rằng tên có thể chỉ là Thi.",
+      "en": "The Complete Annals calls her husband Thi Sach; one study argues that the name may have been simply Thi.",
+      "sources": [
+        "S1",
+        "S3"
+      ],
+      "sourceIds": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "id": "F4",
+      "kind": "disputed",
+      "vi": "Toàn thư chép Tô Định giết chồng bà; nghiên cứu khác đặt lại vấn đề người chồng có thể đã cùng tham gia nổi dậy.",
+      "en": "The Complete Annals says Su Ding killed her husband; another study questions this and suggests that he may have joined the uprising.",
+      "sources": [
+        "S1",
+        "S3"
+      ],
+      "sourceIds": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "id": "F5",
+      "kind": "historical_fact",
+      "vi": "Cuộc nổi dậy do Trưng Trắc và Trưng Nhị lãnh đạo bùng nổ vào mùa xuân năm 40.",
+      "en": "The uprising led by Trung Trac and Trung Nhi began in spring 40 CE.",
+      "sources": [
+        "S1",
+        "S5"
+      ],
+      "sourceIds": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "id": "F6",
+      "kind": "chronicle_record",
+      "vi": "Toàn thư chép Tô Định bỏ chạy sau khi trị sở bị đánh hãm.",
+      "en": "The Complete Annals records that Su Ding fled after the administrative seat was taken.",
+      "sources": [
+        "S1"
+      ],
+      "sourceIds": [
+        "S1"
+      ]
+    },
+    {
+      "id": "F7",
+      "kind": "chronicle_record",
+      "vi": "Toàn thư ghi các quận Cửu Chân, Nhật Nam và Hợp Phố hưởng ứng và 65 thành ở Lĩnh Nam được thu phục.",
+      "en": "The Complete Annals records support from Cuu Chan, Nhat Nam and Hop Pho and the taking of 65 cities in Lingnan.",
+      "sources": [
+        "S1"
+      ],
+      "sourceIds": [
+        "S1"
+      ]
+    },
+    {
+      "id": "F8",
+      "kind": "historical_fact",
+      "vi": "Trưng Trắc tự lập làm vua; Toàn thư ghi bà đóng đô ở Mê Linh.",
+      "en": "Trung Trac established herself as ruler; the Complete Annals places her capital at Me Linh.",
+      "sources": [
+        "S1"
+      ],
+      "sourceIds": [
+        "S1"
+      ]
+    },
+    {
+      "id": "F9",
+      "kind": "chronology",
+      "vi": "Toàn thư tính kỷ Trưng Nữ Vương trong ba năm, từ 40 đến 42; nhiều trình bày hiện đại dùng mốc 40–43.",
+      "en": "The Complete Annals counts the Trung reign as three years, 40–42; many modern summaries use 40–43.",
+      "sources": [
+        "S1",
+        "S5"
+      ],
+      "sourceIds": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "id": "F10",
+      "kind": "historical_fact",
+      "vi": "Năm 41, Đông Hán chuẩn bị hậu cần và cử Mã Viện làm Phục Ba tướng quân, Lưu Long làm phó.",
+      "en": "In 41, the Eastern Han prepared logistics and appointed Ma Yuan as General Fubo with Liu Long as deputy.",
+      "sources": [
+        "S1"
+      ],
+      "sourceIds": [
+        "S1"
+      ]
+    },
+    {
+      "id": "F11",
+      "kind": "historical_fact",
+      "vi": "Năm 42, quân Mã Viện tiến đến Lãng Bạc; lực lượng Trưng Vương rút về Cấm Khê.",
+      "en": "In 42, Ma Yuan's army reached Lang Bac; the Trung forces withdrew toward Cam Khe.",
+      "sources": [
+        "S1"
+      ],
+      "sourceIds": [
+        "S1"
+      ]
+    },
+    {
+      "id": "F12",
+      "kind": "disputed",
+      "vi": "Truyền thống kể Hai Bà Trưng trầm mình ở sông Hát; một cách ghi khác nói hai bà bị giết. Chưa đủ nguồn để khẳng định tuyệt đối một kết cục duy nhất.",
+      "en": "Tradition says the Trung Sisters drowned themselves in the Hat River; another account says they were killed. The permitted evidence is insufficient to confirm one exclusive version.",
+      "sources": [
+        "S5",
+        "S6"
+      ],
+      "sourceIds": [
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "id": "F13",
+      "kind": "author_judgement",
+      "vi": "Lê Văn Hưu ca ngợi việc hai bà tập hợp được nhiều vùng hưởng ứng; đây là lời bình sử gia, không phải dữ kiện độc lập.",
+      "en": "Le Van Huu praised the sisters' ability to rally broad support; this is a historian's judgement, not an independent event fact.",
+      "sources": [
+        "S1"
+      ],
+      "sourceIds": [
+        "S1"
+      ]
+    },
+    {
+      "id": "F14",
+      "kind": "evidence_limit",
+      "vi": "Bộ nguồn hiện có chưa đủ để khẳng định chi tiết về quốc hiệu, cơ cấu quan chức, thuế khóa, quân số chính xác hoặc địa giới chính xác của chính quyền Trưng Vương.",
+      "en": "The available source set is insufficient to confirm a state name, full administrative structure, tax policy, exact troop numbers or exact borders of the Trung polity.",
+      "sources": [
+        "S1",
+        "S2",
+        "S4",
+        "S5"
+      ],
+      "sourceIds": [
+        "S1",
+        "S2",
+        "S4",
+        "S5"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Đại Việt sử ký toàn thư – Kỷ Trưng Nữ Vương (bản trích trên Người Kể Sử; thư mục bản in tại Thư viện Quốc gia)",
+      "titleEn": "Complete Annals of Dai Viet – Annals of the Trung Queen (excerpt hosted by Nguoi Ke Su; printed-edition record at the National Library)",
+      "org": "Đại Việt sử ký toàn thư / Người Kể Sử / Thư viện Quốc gia Việt Nam",
+      "orgEn": "Complete Annals of Dai Viet / Nguoi Ke Su / National Library of Vietnam",
+      "type": "Chính sử; bản văn được đối chiếu với thư mục thư viện",
+      "typeEn": "Official chronicle; text cross-checked against a library bibliography",
+      "url": "https://nguoikesu.com/dong-lich-su/trung-nu-vuong/hai-ba-trung"
+    },
+    {
+      "id": "S2",
+      "title": "Việt Nam sử lược – Trần Trọng Kim (ấn bản được ghi trong Thư mục Quốc gia)",
+      "titleEn": "Viet Nam Su Luoc by Tran Trong Kim (edition recorded in the National Bibliography)",
+      "org": "Thư viện Quốc gia Việt Nam",
+      "orgEn": "National Library of Vietnam",
+      "type": "Công trình lịch sử tổng hợp; dùng để đối chiếu cách kể phổ biến",
+      "typeEn": "General historical work used to compare common narratives",
+      "url": "https://nlv.gov.vn/dmdocuments/tmqg-01-2024.pdf"
+    },
+    {
+      "id": "S3",
+      "title": "Về tên chồng bà Trưng Trắc – Vũ Ngọc Đình",
+      "titleEn": "On the name of Trung Trac's husband – Vu Ngoc Dinh",
+      "org": "Nghiên Cứu Lịch Sử",
+      "orgEn": "Nghien Cuu Lich Su",
+      "type": "Bài nghiên cứu/biên khảo về điểm văn bản còn tranh luận",
+      "typeEn": "Research essay on a disputed textual issue",
+      "url": "https://nghiencuulichsu.com/2016/12/21/ve-ten-chong-ba-trung-trac/"
+    },
+    {
+      "id": "S4",
+      "title": "Cuộc nổi loạn của chị em họ Trưng và chế độ lại trị địa phương của Đế quốc Hán – Lê Minh Chiêu, Hà Hữu Nga dịch",
+      "titleEn": "The Trung Sisters' uprising and local official rule in the Han Empire – Le Minh Chieu, translated by Ha Huu Nga",
+      "org": "Nghiên Cứu Lịch Sử",
+      "orgEn": "Nghien Cuu Lich Su",
+      "type": "Nghiên cứu chuyên đề; dùng cho cách giải thích bối cảnh",
+      "typeEn": "Specialist study used for contextual interpretation",
+      "url": "https://nghiencuulichsu.com/2018/12/06/cuoc-noi-loan-cua-chi-em-ho-trung-va-che-do-lai-tri-dia-phuong-cua-de-quoc-han/"
+    },
+    {
+      "id": "S5",
+      "title": "Trưng Trắc – hồ sơ tổng hợp và đối chiếu các cách ghi",
+      "titleEn": "Trung Trac – compiled profile comparing divergent accounts",
+      "org": "Người Kể Sử",
+      "orgEn": "Nguoi Ke Su",
+      "type": "Nguồn kể sử phổ thông; chỉ dùng bổ trợ và nhận diện điểm khác nhau",
+      "typeEn": "Popular history source used only as supporting material and to identify divergent accounts",
+      "url": "https://nguoikesu.com/nhan-vat/trung-trac"
+    },
+    {
+      "id": "S6",
+      "title": "Hai Bà Trưng – tổng hợp nguồn gốc, khởi nghĩa và các cách ghi về kết cục",
+      "titleEn": "The Trung Sisters – compiled account of origins, uprising and divergent endings",
+      "org": "Người Kể Sử",
+      "orgEn": "Nguoi Ke Su",
+      "type": "Nguồn kể sử phổ thông; không dùng làm căn cứ duy nhất cho điểm tranh luận",
+      "typeEn": "Popular history source; not used alone for disputed claims",
+      "url": "https://nguoikesu.com/nhan-vat/hai-ba-trung"
+    },
+    {
+      "id": "S7",
+      "title": "Thư mục sách Thăng Long – Hà Nội: mục Đại Việt sử ký toàn thư",
+      "titleEn": "Thang Long–Hanoi bibliography: entry for the Complete Annals of Dai Viet",
+      "org": "Thư viện Quốc gia Việt Nam",
+      "orgEn": "National Library of Vietnam",
+      "type": "Thư mục xác nhận ấn bản, dịch giả và phạm vi tập I",
+      "typeEn": "Bibliographic record confirming edition, translators and scope of volume I",
+      "url": "https://nlv.gov.vn/thu-muc-chuyen-de/thu-muc-sach-thang-long-ha-noi-phan-1-dia-linh-nhan-kiet-dat-de-vuong-1-1-300.html"
+    }
+  ],
+  "qaSuggestions": {
+    "vi": [
+      "Trưng Trắc xưng vương trong bối cảnh nào?",
+      "Các nguồn ghi khác nhau thế nào về Thi Sách?",
+      "Sự kiện Lãng Bạc và Cấm Khê được Toàn thư chép ra sao?",
+      "Có chắc Hai Bà Trưng trầm mình ở sông Hát không?"
+    ],
+    "en": [
+      "In what context did Trung Trac proclaim herself ruler?",
+      "How do the sources differ over Thi Sach?",
+      "How does the Complete Annals describe Lang Bac and Cam Khe?",
+      "Is it certain that the Trung Sisters drowned in the Hat River?"
+    ]
+  },
+  "whatifSuggestions": {
+    "vi": [
+      "Nếu mạng lưới hậu cần của chính quyền Trưng Vương được củng cố trước cuộc phản công thì sao?",
+      "Nếu lực lượng Trưng Vương giữ được tuyến Lãng Bạc thì sao?",
+      "Nếu các thủ lĩnh địa phương duy trì phối hợp lâu hơn thì sao?"
+    ],
+    "en": [
+      "What if the Trung polity had strengthened logistics before the Han counteroffensive?",
+      "What if the Trung forces had held the Lang Bac line?",
+      "What if local leaders had maintained coordination for longer?"
+    ]
+  },
+  "roleplay": {
+    "maxTurns": 6,
+    "learnerRole": {
+      "vi": "Bạn nhập vai Trưng Trắc.",
+      "en": "You play Trung Trac."
+    },
+    "setting": {
+      "vi": "Mùa xuân năm 40, trước khi lực lượng nổi dậy mở rộng cuộc tiến công từ vùng Mê Linh. Bối cảnh có thật: sự cai trị của Tô Định gây bất mãn; mạng lưới Lạc tướng và các cộng đồng địa phương là nguồn lực quan trọng. Phần diễn biến sau mỗi lựa chọn là mô phỏng giáo dục.",
+      "en": "Spring 40 CE, before the uprising expands its offensive from the Me Linh region. Historical background: Su Ding's rule has caused resentment, and networks of Lac leaders and local communities are crucial resources. Events following each choice are educational simulation.",
+      "sourceIds": [
+        "S1",
+        "S4"
+      ],
+      "evidenceType": "historical_background"
+    },
+    "opening": {
+      "vi": "Trưng Trắc phải quyết định cách biến sự bất mãn rời rạc thành một lực lượng có chỉ huy, có hậu cần và có chính danh, trong khi nguy cơ trấn áp đang tăng.",
+      "en": "Trung Trac must decide how to turn scattered resentment into a force with command, logistics and legitimacy while the risk of repression is rising.",
+      "sourceIds": [],
+      "evidenceType": "simulation_based_on_historical_background",
+      "contextSourceIds": [
+        "S1",
+        "S4"
+      ]
+    },
+    "evaluationFactors": {
+      "vi": [
+        "quân sự",
+        "ngoại giao/liên minh",
+        "lòng dân",
+        "hậu cần",
+        "chính trị/chính danh",
+        "quản trị"
+      ],
+      "en": [
+        "military position",
+        "diplomacy and alliances",
+        "public support",
+        "logistics",
+        "politics and legitimacy",
+        "governance"
+      ]
+    },
+    "rules": {
+      "vi": "Mỗi lượt chưa kết thúc phải có đúng 3 lựa chọn. Nguồn chỉ gắn cho bối cảnh có thật; mọi hệ quả do lựa chọn tạo ra phải ghi rõ là mô phỏng.",
+      "en": "Each unfinished turn must offer exactly three choices. Sources may support only real background; all consequences created by choices must be labelled as simulation."
+    }
+  }
+}
