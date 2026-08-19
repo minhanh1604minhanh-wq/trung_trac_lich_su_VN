@@ -62,3 +62,29 @@ Mở `http://localhost:3000`; kiểm tra `http://localhost:3000/health`.
 ## Nguyên tắc nội dung
 
 AI chỉ nhận bộ facts trong `trung-trac.json`. Khi dữ liệu không đủ, câu trả lời tiếng Việt phải ghi “Chưa đủ nguồn để khẳng định.” Các điểm về tên chồng, niên đại cuối đời và cách kể cái chết được đánh dấu là tranh luận/truyền thống thay vì khẳng định tuyệt đối.
+
+
+## Analytics trung tâm (v5.8.4)
+
+Bản này **không dùng Google Sheets**. Hoạt động người dùng được gửi an toàn theo mô hình backend-to-backend tới website quản lý.
+
+### Vercel Environment Variables cần thêm cho website Trưng Trắc
+
+```env
+ANALYTICS_API_URL=https://quan-ly-s7j8.vercel.app
+ANALYTICS_INGEST_KEY=<cùng giá trị ANALYTICS_INGEST_KEY của website quản lý>
+```
+
+`ANALYTICS_INGEST_KEY` chỉ tồn tại ở backend/Vercel, không được đưa vào `public/config.js` hoặc GitHub.
+
+### Sự kiện được ghi
+- `session_start`, `session_end`
+- `page_view`, `character_open`
+- `profile_open`, `timeline_view`
+- `narration_play`
+- `qa_open`, `ask_question`
+- `whatif_open`, `whatif_question`
+- `roleplay_open`, `roleplay_start`, `roleplay_new_scenario`, `roleplay_choice`, `roleplay_end`
+- `language_change`
+
+Tên người tham gia là bắt buộc; lớp và trường không bắt buộc. Website chỉ lưu một visitor ID kỹ thuật theo từng danh tính trên trình duyệt, không lưu dai dẳng tên/lớp/trường trong localStorage.

@@ -12,6 +12,8 @@ const PORT=process.env.PORT||3000;
 const PUBLIC=path.join(__dirname,'public');
 const DATA=path.join(PUBLIC,'data');
 const openai=process.env.OPENAI_API_KEY?new OpenAI({apiKey:process.env.OPENAI_API_KEY}):null;
+const ANALYTICS_API_URL=String(process.env.ANALYTICS_API_URL||'').trim().replace(/\/+$/,'');
+const ANALYTICS_INGEST_KEY=String(process.env.ANALYTICS_INGEST_KEY||'').trim();
 
 app.disable('x-powered-by');
 app.use(cors());
@@ -45,7 +47,71 @@ async function jsonChat(messages,temp=.35){
   return JSON.parse(r.choices[0].message.content);
 }
 
-app.get('/health',(_,res)=>res.json({ok:true,character:'trung-trac',aiReady:Boolean(openai)}));
+app.get('/health',(_,res)=>res.json({ok:true,character:'trung-trac',aiReady:Boolean(openai),analyticsReady:Boolean(ANALYTICS_API_URL&&ANALYTICS_INGEST_KEY)}));
+
+
+async function forwardAnalyticsEvent(body={}){
+  if(!ANALYTICS_API_URL||!ANALYTICS_INGEST_KEY)return {skipped:true,reason:'ANALYTICS_NOT_CONFIGURED'};
+  const p=profile(body.characterId||'trung-trac');
+  if(!p)throw new Error('Character not configured');
+
+  const participant=body.participant&&typeof body.participant==='object'?body.participant:{};
+  const participantName=clean(participant.name,250);
+  const sessionId=clean(body.sessionId,200);
+  const visitorId=clean(body.visitorId,200);
+  const eventType=clean(body.eventType,120);
+  if(!participantName||!sessionId||!visitorId||!eventType)throw new Error('Missing analytics identity fields');
+
+  const payload={
+    eventId:clean(body.eventId,200)||undefined,
+    sessionId,
+    visitorId,
+    eventType,
+    feature:clean(body.feature,120)||undefined,
+    content:clean(body.content,5000)||undefined,
+    language:body.language==='en'?'en':'vi',
+    occurredAt:body.occurredAt||new Date().toISOString(),
+    startedAt:body.startedAt||undefined,
+    endedAt:body.endedAt||undefined,
+    durationSeconds:Math.max(0,Number(body.durationSeconds)||0),
+    participant:{
+      name:participantName,
+      className:clean(participant.className,200)||undefined,
+      schoolName:clean(participant.schoolName,300)||undefined
+    },
+    character:{
+      slug:p.id||'trung-trac',
+      nameVi:p.name||'Trưng Trắc',
+      nameEn:p.nameEn||'Trung Trac'
+    },
+    sessionMetadata:body.sessionMetadata&&typeof body.sessionMetadata==='object'?body.sessionMetadata:{},
+    metadata:body.metadata&&typeof body.metadata==='object'?body.metadata:{}
+  };
+
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),6500);
+  try{
+    const r=await fetch(`${ANALYTICS_API_URL}/api/events`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-analytics-key':ANALYTICS_INGEST_KEY},
+      body:JSON.stringify(payload),
+      signal:controller.signal
+    });
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||d.ok===false)throw new Error(d.error||`Analytics HTTP ${r.status}`);
+    return {skipped:false,eventId:d.eventId||payload.eventId||null};
+  }finally{clearTimeout(timer)}
+}
+
+app.post('/analytics-event',async(req,res)=>{
+  try{
+    const result=await forwardAnalyticsEvent(req.body||{});
+    res.status(result.skipped?202:200).json({ok:true,...result});
+  }catch(e){
+    console.warn('analytics forward error',e?.message||e);
+    res.status(502).json({ok:false,message:'Analytics service unavailable'});
+  }
+});
 
 app.post('/ask',async(req,res)=>{
   const p=profile(req.body.characterId);

@@ -67,7 +67,7 @@ check('HTML không trùng ID',duplicates.length===0,[...new Set(duplicates)].joi
 check('Mọi ID JS đều có trong HTML',missing.length===0,missing.join(', '));
 check('DEFAULT_CHARACTER_ID đúng',/DEFAULT_CHARACTER_ID\s*:\s*["']trung-trac["']/.test(config));
 check('API_BASE_URL cùng domain',/API_BASE_URL\s*:\s*["']["']/.test(config));
-for(const ep of ['/health','/ask','/whatif','/roleplay','/speak'])check(`Endpoint ${ep}`,server.includes(`'${ep}'`)||server.includes(`"${ep}"`));
+for(const ep of ['/health','/ask','/whatif','/roleplay','/speak','/analytics-event'])check(`Endpoint ${ep}`,server.includes(`'${ep}'`)||server.includes(`"${ep}"`));
 check('Không còn endpoint lưu báo cáo ngoài',!server.includes(['/save','report'].join('-')));
 check('Tên người tham gia bắt buộc',html.includes('id="playerName"')&&html.includes('required aria-required="true"')&&js.includes("nameRequired:'Vui lòng nhập tên người tham gia trước khi bắt đầu.'")&&js.includes("if(!name){$('participantError').textContent=t('nameRequired')"));
 check('Lớp và trường tùy chọn',html.includes('id="playerClass"')&&html.includes('id="playerSchool"')&&js.includes("state.className=$('playerClass').value.trim()")&&js.includes("state.school=$('playerSchool').value.trim()"));
@@ -75,6 +75,13 @@ check('Thông tin người tham gia sẵn sàng cho analytics',js.includes('func
 check('Không lưu dai dẳng thông tin cá nhân trên kiosk',!js.includes('localStorage.setItem(\'history_name\'')&&!js.includes('localStorage.setItem(\'history_class\'')&&!js.includes('localStorage.setItem(\'history_school\''));
 check('Không còn vòng tròn trang trí tool-card',!css.includes('.tool-card::after'));
 check('Không còn Google Sheets runtime',!server.match(/GOOGLE_SHEET_URL|google-apps-script|script\.google\.com|spreadsheets/i)&&!js.match(/GOOGLE_SHEET_URL|google-apps-script|script\.google\.com|spreadsheets/i)&&!config.match(/GOOGLE_SHEET_URL|google-apps-script|script\.google\.com|spreadsheets/i));
+
+check('Analytics key chỉ ở backend',server.includes('process.env.ANALYTICS_INGEST_KEY')&&!js.includes('ANALYTICS_INGEST_KEY'));
+check('Analytics URL chỉ ở backend/env',server.includes('process.env.ANALYTICS_API_URL')&&!js.includes('ANALYTICS_API_URL'));
+check('Frontend gửi analytics qua backend cùng domain',js.includes("fetch(API+'/analytics-event'"));
+check('Analytics có participant bắt buộc',js.includes('participant:{name:state.name,className:state.className,schoolName:state.school}'));
+check('Analytics ghi Tra cứu/Giả định/Nhập vai',js.includes("'ask_question'")&&js.includes("'whatif_question'")&&js.includes("'roleplay_choice'"));
+
 check('Nút nhập vai có trạng thái tình huống mới',js.includes("roleRestart:'Bắt đầu tình huống mới'")&&js.includes('state.roleActive?t(\'roleRestart\'):t(\'roleStart\')'));
 check('Tình huống mới reset lịch sử và lượt',/function startNewRoleScenario\(\)\{[\s\S]*?state\.roleHistory=\[\];[\s\S]*?state\.roleTurn=1;[\s\S]*?roleTurn\(\)/.test(js));
 check('Chỉ số mô phỏng dùng nhãn định tính',js.includes("2:'Trung bình'")&&js.includes("3:'Khá'")&&js.includes("4:'Tốt'")&&js.includes("roleMetrics:'Chỉ số mô phỏng'"));

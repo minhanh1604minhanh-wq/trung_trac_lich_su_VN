@@ -1,4 +1,4 @@
-TRUNG_TRAC_FULL — v5.8.3 PARTICIPANT READY / NO SHEETS
+TRUNG_TRAC_FULL — v5.8.4 ANALYTICS CONNECTED / NO SHEETS
 
 Core:
 - server.js
@@ -8,6 +8,8 @@ Core:
 - README.md
 - SOURCE_POLICY.md
 - validate-project.js
+- VALIDATION_REPORT_v5.8.4.txt
+- ANALYTICS_INTEGRATION_v5.8.4.md
 
 Frontend:
 - public/index.html
@@ -25,6 +27,12 @@ Participant fields:
 - name: required
 - class: optional
 - school: optional
+
+Central analytics:
+- Browser -> same-domain /analytics-event
+- Trung Trac backend -> manager POST /api/events
+- ANALYTICS_INGEST_KEY remains server-only
+- Tracks session, profile, timeline, narration, ask, what-if, roleplay, language and duration
 
 Google Sheets: removed
 Decorative tool-card corner circle: removed
