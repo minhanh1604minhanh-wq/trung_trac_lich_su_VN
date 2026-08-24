@@ -549,17 +549,24 @@ function resetIdle(){clearTimeout(state.idleTimer);if(CFG.ENABLE_KIOSK_RESET!==f
 ['pointerdown','keydown','touchstart'].forEach(ev=>addEventListener(ev,resetIdle,{passive:true}));
 qsa('[data-panel]').forEach(b=>b.addEventListener('click',()=>openPanel(b.dataset.panel)));qsa('.panel-close').forEach(b=>b.addEventListener('click',closePanels));$('backdrop').onclick=closePanels;document.addEventListener('click',e=>{const s=e.target.closest('[data-source]');if(s){openPanel('sourcesPanel');setTimeout(()=>document.getElementById('src-'+s.dataset.source)?.scrollIntoView({behavior:'smooth',block:'center'}),100)}const f=e.target.closest('[data-fill]');if(f)$(f.dataset.input).value=f.dataset.fill});
 $('startBtn').onclick=()=>{const name=$('playerName').value.trim();if(!name){$('participantError').textContent=t('nameRequired');$('playerName').focus();$('playerName').setAttribute('aria-invalid','true');return}$('participantError').textContent='';$('playerName').removeAttribute('aria-invalid');primeInstantSpeech();state.name=name;state.className=$('playerClass').value.trim();state.school=$('playerSchool').value.trim();startAnalyticsSession();unlockNarrationAudio();$('intro').classList.add('hidden');$('dustScreen').classList.remove('hidden');initDust()};$('introLangBtn').onclick=changeLang;$('langBtn').onclick=changeLang;$('resetCameraBtn').onclick=resetCamera;$('audioBtn').onclick=()=>{state.audio=!state.audio;setAudioButtonState();if(!state.audio){$('narrationVi').pause();$('narrationEn').pause();$('narrationVi').loop=false;$('narrationEn').loop=false;stopAIResponseAudio()}else if(state.mainStarted&&qsa('.panel').every(p=>p.classList.contains('hidden'))){state.narrationShouldResume=false;playNarrationNow()}};$('qaSendBtn').onclick=sendQa;$('whatifSendBtn').onclick=sendWhatif;$('roleStartBtn').onclick=startNewRoleScenario;$('journeySummaryBtn').onclick=showSummary;$('finishBtn').onclick=()=>{void endAnalyticsSession('finish');showSummary()};$('summaryPdfBtn').onclick=()=>{if(window.html2pdf)html2pdf().set({margin:.5,filename:`Tong_ket_${profile.id}.pdf`,html2canvas:{scale:2},jsPDF:{unit:'in',format:'a4',orientation:'portrait'}}).from($('summaryPrintable')).save()};$('roleExportBtn').onclick=()=>{
- if(!window.html2pdf)return;
- const source=$('roleplayPanel');
- const clone=source.cloneNode(true);
- clone.id='roleplayPdfExport';
- clone.classList.remove('hidden');
- clone.querySelectorAll('button').forEach(b=>b.remove());
- clone.style.position='fixed';clone.style.left='-10000px';clone.style.top='0';
- clone.style.width='760px';clone.style.height='auto';clone.style.maxHeight='none';clone.style.overflow='visible';
- clone.style.background='#fff';clone.style.color='#222';
- document.body.appendChild(clone);
- html2pdf().set({margin:.5,filename:`Nhap_vai_${profile.id}.pdf`,html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'in',format:'a4',orientation:'portrait'}}).from(clone).save().then(()=>clone.remove()).catch(()=>clone.remove());
+  if(!window.html2pdf)return;
+  const source=$('roleplayPanel');
+  if(!source)return;
+  const clone=source.cloneNode(true);
+  clone.id='roleplayExportTemp';
+  clone.classList.remove('hidden');
+  clone.style.position='fixed';
+  clone.style.left='-10000px';
+  clone.style.top='0';
+  clone.style.width='794px';
+  clone.style.background='#fff';
+  clone.style.color='#111';
+  clone.style.height='auto';
+  clone.querySelectorAll('button').forEach(b=>b.remove());
+  document.body.appendChild(clone);
+  requestAnimationFrame(()=>{
+    html2pdf().set({margin:.5,filename:`Nhap_vai_${profile.id}.pdf`,html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false},jsPDF:{unit:'in',format:'a4',orientation:'portrait'}}).from(clone).save().then(()=>clone.remove()).catch(()=>clone.remove());
+  });
 };$('newSessionBtn').onclick=()=>{void endAnalyticsSession('new_session');setTimeout(()=>location.reload(),80)};setupMic('qaMicBtn','qaInput');setupMic('whatifMicBtn','whatifInput');['playerName','playerClass','playerSchool'].forEach(id=>$(id).addEventListener('input',()=>{if(id==='playerName'&&$(id).value.trim()){$('participantError').textContent='';$(id).removeAttribute('aria-invalid')}}));$('playerName').addEventListener('keydown',e=>{if(e.key==='Enter')$('startBtn').click()});
 addEventListener('pagehide',()=>{void endAnalyticsSession('pagehide')},{capture:true});
 const model=$('historyModel');model.addEventListener('load',()=>{$('modelState').classList.add('hidden')});model.addEventListener('error',()=>{$('modelStateTitle').textContent=t('modelError');$('retryModelBtn').classList.remove('hidden')});$('retryModelBtn').onclick=()=>{model.src='';setTimeout(()=>model.src=profile.model,50)};
