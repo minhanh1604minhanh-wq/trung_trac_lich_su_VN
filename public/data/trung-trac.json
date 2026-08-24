@@ -620,6 +620,29 @@
       "vi": "Bạn nhập vai Trưng Trắc.",
       "en": "You play Trung Trac."
     },
+    "npcRole": {
+      "vi": "AI nhập vai một cố vấn trong hội đồng nghĩa quân đang trình bày phương án với Trưng Trắc.",
+      "en": "The AI plays an adviser in the rebel council presenting options to Trung Trac."
+    },
+    "addressRule": {
+      "vi": "Nói ở ngôi thứ nhất với tư cách người cố vấn; gọi người học là “Trưng Trắc” hoặc “chủ tướng”. Không bao giờ tự nhận mình là Trưng Trắc và không viết thay lời của người học.",
+      "en": "Speak in the first person as the adviser; address the learner as 'Trung Trac' or 'commander'. Never claim to be Trung Trac and never write the learner's lines for them."
+    },
+    "identityGuard": {
+      "fallbackNpcDialogue": {
+        "vi": "Trưng Trắc, xin cân nhắc ba phương án dưới đây; mọi hệ quả tiếp theo đều là mô phỏng giáo dục.",
+        "en": "Trung Trac, consider the three options below; every consequence that follows is an educational simulation."
+      },
+      "forbiddenNpcPhrases": {
+        "vi": [
+          "Tôi là Trưng Trắc",
+          "Ta là Trưng Trắc"
+        ],
+        "en": [
+          "I am Trung Trac"
+        ]
+      }
+    },
     "setting": {
       "vi": "Mùa xuân năm 40, trước khi lực lượng nổi dậy mở rộng cuộc tiến công từ vùng Mê Linh. Bối cảnh có thật: sự cai trị của Tô Định gây bất mãn; mạng lưới Lạc tướng và các cộng đồng địa phương là nguồn lực quan trọng. Phần diễn biến sau mỗi lựa chọn là mô phỏng giáo dục.",
       "en": "Spring 40 CE, before the uprising expands its offensive from the Me Linh region. Historical background: Su Ding's rule has caused resentment, and networks of Lac leaders and local communities are crucial resources. Events following each choice are educational simulation.",

@@ -1,4 +1,4 @@
-TRUNG_TRAC_FULL — v5.8.4 ANALYTICS CONNECTED / NO SHEETS
+TRUNG_TRAC_FULL — v5.8.5 OPTIMIZED / ANALYTICS CONNECTED / NO SHEETS
 
 Core:
 - server.js
@@ -8,8 +8,9 @@ Core:
 - README.md
 - SOURCE_POLICY.md
 - validate-project.js
-- VALIDATION_REPORT_v5.8.4.txt
-- ANALYTICS_INTEGRATION_v5.8.4.md
+- VALIDATION_REPORT_v5.8.5.txt
+- ANALYTICS_INTEGRATION_v5.8.5.md
+- PROMPT_MASTER_WEBSITE_NHAN_VAT_LICH_SU_v5.8.5.md
 
 Frontend:
 - public/index.html
@@ -17,6 +18,8 @@ Frontend:
 - public/app.js
 - public/config.js
 - public/data/trung-trac.json
+- public/vendor/html2pdf.bundle.min.js
+- public/vendor/html2pdf.bundle.min.js.LICENSE.txt
 
 Assets:
 - public/assets/trung_trac.glb
@@ -33,6 +36,13 @@ Central analytics:
 - Trung Trac backend -> manager POST /api/events
 - ANALYTICS_INGEST_KEY remains server-only
 - Tracks session, profile, timeline, narration, ask, what-if, roleplay, language and duration
+- Tracks successful PDF exports
+
+Optimizations:
+- Role identity lock + one corrective retry
+- Dedicated full-history PDF worksheet; no off-screen panel capture
+- AI response speech rate 1.12x
+- Defensive AI field normalization and distinct role-play choices
 
 Google Sheets: removed
 Decorative tool-card corner circle: removed

@@ -1,4 +1,4 @@
-const AI_SPEECH_RATE=1.08;
+const AI_SPEECH_RATE=1.12;
 function buildQaSpeech(data={}){
   return String(data.reply||'').trim();
 }
@@ -25,7 +25,68 @@ function buildWhatifSpeech(data={},lang='vi'){
     `${labels.uncertainty}: ${String(data.uncertainty||'').trim()}`
   ].join(' ');
 }
-const __HistoryAIResponseUtils={AI_SPEECH_RATE,buildQaSpeech,buildWhatifSpeech};
+function escapeExportHtml(value=''){
+  return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function roleMetricText(value,lang='vi'){
+  const score=Math.max(1,Math.min(5,Math.round(Number(value)||3)));
+  const labels=lang==='en'
+    ?{1:'Weak',2:'Average',3:'Good',4:'Strong',5:'Excellent'}
+    :{1:'Yếu',2:'Trung bình',3:'Khá',4:'Tốt',5:'Rất tốt'};
+  return labels[score];
+}
+function parseRoleplayHistory(history=[]){
+  const records=[];
+  let choiceBeforeTurn='';
+  for(const item of Array.isArray(history)?history:[]){
+    if(item?.role==='user'){
+      choiceBeforeTurn=String(item.content||'').trim();
+      continue;
+    }
+    if(item?.role!=='assistant')continue;
+    let data={};
+    try{data=typeof item.content==='string'?JSON.parse(item.content):(item.content||{})}catch{data={npcDialogue:String(item.content||'')}}
+    records.push({
+      turn:records.length+1,
+      choiceBeforeTurn,
+      npcDialogue:String(data.npcDialogue||''),
+      feedback:String(data.feedback||''),
+      evaluation:data.evaluation&&typeof data.evaluation==='object'?data.evaluation:{},
+      sourceIds:Array.isArray(data.sourceIds)?data.sourceIds.map(String):[],
+      endReason:String(data.endReason||''),
+      isGameOver:data.isGameOver===true
+    });
+    choiceBeforeTurn='';
+  }
+  return records;
+}
+function buildRoleplayWorksheetMarkup({profile={},participant={},history=[],lang='vi'}={}){
+  const en=lang==='en';
+  const e=escapeExportHtml;
+  const records=parseRoleplayHistory(history);
+  const characterName=en?(profile.nameEn||profile.name||''):(profile.name||profile.nameEn||'');
+  const role=profile.roleplay?.learnerRole?.[lang]||'';
+  const setting=profile.roleplay?.setting?.[lang]||'';
+  const participantRows=[
+    [en?'Participant':'Người tham gia',participant.name],
+    [en?'Class':'Lớp',participant.className],
+    [en?'School':'Trường',participant.school]
+  ].filter(([,value])=>String(value||'').trim());
+  const metricLabels=en
+    ?{military:'Military',diplomacy:'Diplomacy',publicSupport:'Public support',logistics:'Logistics',politics:'Politics',governance:'Governance'}
+    :{military:'Quân sự',diplomacy:'Ngoại giao',publicSupport:'Lòng dân',logistics:'Hậu cần',politics:'Chính trị',governance:'Quản trị'};
+  const turns=records.map(record=>{
+    const metrics=Object.entries(metricLabels)
+      .filter(([key])=>record.evaluation[key]!==undefined&&record.evaluation[key]!==null&&record.evaluation[key]!=='')
+      .map(([key,label])=>`<li><b>${e(label)}:</b> ${e(roleMetricText(record.evaluation[key],lang))}</li>`).join('');
+    const sources=record.sourceIds.length
+      ?`<p class="pdf-sources"><b>${e(en?'Historical context sources':'Nguồn cho bối cảnh có thật')}:</b> ${record.sourceIds.map(id=>`<span>${e(id)}</span>`).join(' ')}</p>`
+      :'';
+    return `<article class="pdf-turn"><h2>${e(en?'Turn':'Lượt')} ${record.turn}</h2>${record.choiceBeforeTurn?`<p class="pdf-choice"><b>${e(en?'Previous decision':'Quyết định đã chọn')}:</b> ${e(record.choiceBeforeTurn)}</p>`:''}${record.feedback?`<p><b>${e(en?'Feedback':'Nhận xét')}:</b> ${e(record.feedback)}</p>`:''}${record.npcDialogue?`<p><b>${e(en?'Role-play response':'Phản hồi nhập vai')}:</b> ${e(record.npcDialogue)}</p>`:''}${metrics?`<h3>${e(en?'Simulation indicators':'Chỉ số mô phỏng')}</h3><ul class="pdf-metrics">${metrics}</ul>`:''}${sources}${record.endReason?`<p class="pdf-summary"><b>${e(en?'Summary':'Tổng kết')}:</b> ${e(record.endReason)}</p>`:''}</article>`;
+  }).join('');
+  return `<header class="pdf-header"><p>${e(en?'LEARNING WORKSHEET':'PHIẾU HỌC TẬP')}</p><h1>${e(en?'Historical decision role-play':'Nhập vai quyết sách')} - ${e(characterName)}</h1><div class="pdf-participant">${participantRows.map(([label,value])=>`<p><b>${e(label)}:</b> ${e(value)}</p>`).join('')}</div></header><section class="pdf-context"><p><b>${e(en?'Learner role':'Vai người học')}:</b> ${e(role)}</p><p><b>${e(en?'Setting':'Bối cảnh')}:</b> ${e(setting)}</p><p class="pdf-notice">${e(en?'Educational simulation. Indicators and choice consequences are not historical facts.':'Mô phỏng giáo dục. Chỉ số và hệ quả do lựa chọn tạo ra không phải dữ kiện lịch sử.')}</p></section><main>${turns||`<p>${e(en?'No completed role-play turn is available.':'Chưa có lượt nhập vai hoàn chỉnh để xuất.')}</p>`}</main>`;
+}
+const __HistoryAIResponseUtils={AI_SPEECH_RATE,buildQaSpeech,buildWhatifSpeech,parseRoleplayHistory,buildRoleplayWorksheetMarkup,roleMetricText};
 if(typeof module!=='undefined'&&module.exports)module.exports=__HistoryAIResponseUtils;
 if(typeof window!=='undefined'){
 (()=>{
@@ -121,12 +182,33 @@ function setAudioButtonState(){
     btn.setAttribute('aria-label',label);
   }
 }
-function esc(v=''){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function esc(v=''){return escapeExportHtml(v);}
 function playClick(){if(!state.audio)return;try{const C=window.AudioContext||window.webkitAudioContext;state.ctx||=new C();const c=state.ctx;if(c.state==='suspended')c.resume();const o=c.createOscillator(),g=c.createGain(),n=c.currentTime;o.type='triangle';o.frequency.setValueAtTime(300,n);o.frequency.exponentialRampToValueAtTime(170,n+.05);g.gain.setValueAtTime(.06,n);g.gain.exponentialRampToValueAtTime(.001,n+.065);o.connect(g).connect(c.destination);o.start(n);o.stop(n+.07)}catch{}}
 document.addEventListener('click',e=>{if(e.target.closest('button'))playClick()});
-async function loadProfile(){const id=new URLSearchParams(location.search).get('character')||CFG.DEFAULT_CHARACTER_ID||'trung-trac';profile=await fetch(`./data/${id}.json`,{cache:'no-store'}).then(r=>r.json());$('historyModel').src=profile.model;$('narrationVi').src=profile.narration.vi;$('narrationEn').src=profile.narration.en;$('narrationVi').volume=1;$('narrationEn').volume=1;renderAll();}
+async function loadProfile(){
+  const fallback=CFG.DEFAULT_CHARACTER_ID||'trung-trac';
+  const requested=new URLSearchParams(location.search).get('character')||fallback;
+  const id=/^[a-z0-9-]+$/i.test(requested)?requested:fallback;
+  const response=await fetch(`./data/${id}.json`,{cache:'no-store'});
+  if(!response.ok)throw new Error(`Không tải được hồ sơ (${response.status}).`);
+  profile=await response.json();
+  if(!profile?.id||!profile?.model||!profile?.narration?.vi||!profile?.narration?.en)throw new Error('Hồ sơ nhân vật thiếu dữ liệu bắt buộc.');
+  $('historyModel').src=profile.model;$('narrationVi').src=profile.narration.vi;$('narrationEn').src=profile.narration.en;$('narrationVi').volume=1;$('narrationEn').volume=1;renderAll();
+}
 function renderAll(){document.documentElement.lang=state.lang; const en=state.lang==='en';document.title=`${en?'Interactive History Museum':'Bảo tàng lịch sử tương tác'} — ${en?profile.nameEn:profile.name}`;$('historyModel').alt=en?`3D model of ${profile.nameEn}`:`Mô hình 3D ${profile.name}`; $('introName').textContent=en?profile.nameEn:profile.name;$('introText').textContent=profile.intro[state.lang];$('introMeta').innerHTML=`<span>${esc(en?(profile.yearsEn||profile.years):profile.years)}</span><span>${esc(en?profile.dynastyEn:profile.dynasty)}</span><span>${esc(en?(profile.capitalEn||profile.capital):profile.capital)}</span>`;$('characterName').textContent=en?profile.nameEn:profile.name;$('periodText').textContent=en?profile.periodEn:profile.period;$('nameLabel').innerHTML=`${esc(t('name'))} <span class="required-mark" aria-hidden="true">*</span>`;$('playerName').placeholder=t('namePh');$('classLabel').innerHTML=`${esc(t('classLabel'))} <small>(${esc(t('classOptional'))})</small>`;$('playerClass').placeholder=t('classPh');$('schoolLabel').innerHTML=`${esc(t('schoolLabel'))} <small>(${esc(t('schoolOptional'))})</small>`;$('playerSchool').placeholder=t('schoolPh');$('startBtn').textContent=t('start');$('introLangBtn').textContent=en?'Tiếng Việt':'English';$('langBtn').textContent=en?'VI':'EN';setAudioButtonState();$('navProfileTitle').textContent=t('profile');$('navProfileSub').textContent=t('profileSub');$('learningLabel').textContent=t('tools');$('navQaTitle').textContent=t('qa');$('navQaSub').textContent=t('qaSub');$('navWhatifTitle').textContent=t('whatif');$('navWhatifSub').textContent=t('whatifSub');$('navRoleTitle').textContent=t('role');$('navRoleSub').textContent=t('roleSub');$('dustEyebrow').textContent=t('dustEyebrow');$('dustTitle').textContent=t('dustTitle');$('dustSub').textContent=t('dustSub');$('brushBtn').textContent=t('brush');$('skipDustBtn').textContent=t('skip');$('profileEyebrow').textContent=t('profileEyebrow');$('profileTitle').textContent=en?profile.nameEn:profile.name;$('profileLead').textContent=en?profile.intro.en:profile.intro.vi;$('timelineHeading').textContent=t('timeline');$('infoHeading').textContent=t('info');$('qaHeading').textContent=t('qa');$('qaHelp').textContent=t('qaHelp');$('qaInput').placeholder=profile.qaPlaceholder?.[state.lang]||t('qaPlaceholder');$('qaSendBtn').textContent=t('qaSend');$('qaMicBtn').textContent=t('mic');if(!$('qaResult').dataset.filled)$('qaResult').textContent=t('qaEmpty');$('whatifHeading').textContent=t('whatif');$('whatifHelp').textContent=t('whatifHelp');$('whatifInput').placeholder=profile.whatifPlaceholder?.[state.lang]||t('whatifPlaceholder');$('whatifSendBtn').textContent=t('whatifSend');$('whatifMicBtn').textContent=t('mic');if(!$('whatifResult').dataset.filled)$('whatifResult').textContent=t('whatifEmpty');$('roleHeading').textContent=t('role');$('roleHelp').textContent=`${profile.roleplay?.learnerRole?.[state.lang]||''} ${t('roleHelp')}`.trim();$('roleTurn').textContent=`${state.lang==='vi'?'Lượt':'Turn'} ${state.roleHistory.length?state.roleTurn:0} / ${Number(profile.roleplay?.maxTurns||6)}`;$('roleStartBtn').textContent=state.roleActive?t('roleRestart'):t('roleStart');$('roleExportBtn').textContent=t('roleExport');$('simulationLabel').textContent=t('simulation');$('sourcesHeading').textContent=t('sources');$('sourcesHelp').textContent=t('sourcesHelp');$('guideHeading').textContent=t('guide');$('journeyHeading').textContent=t('journey');$('journeySummaryTitle').textContent=t('summaryBtn');$('journeySummarySub').textContent=t('summarySub');$('summaryHeading').textContent=`${t('summary')} — ${en?profile.nameEn:profile.name}`;$('summaryPdfBtn').textContent=t('pdf');$('newSessionBtn').textContent=t('newSession');renderProfile();renderSources();renderSuggestions();renderJourney();renderGuide();}
-function renderProfile(){const en=state.lang==='en';$('profileStats').innerHTML=[[(en?'Years':'Năm'),en?(profile.yearsEn||profile.years):profile.years],[(en?'Polity':'Triều đại'),en?profile.dynastyEn:profile.dynasty],[(en?'Rule':'Trị vì'),en?(profile.reignEn||profile.reign):profile.reign],[(en?'Capital':'Kinh đô'),en?(profile.capitalEn||profile.capital):profile.capital]].map(([a,b])=>`<div class="stat"><small>${esc(a)}</small><b>${esc(b)}</b></div>`).join('');$('timeline').innerHTML=profile.timeline.map(x=>`<div class="timeline-item"><div class="timeline-year">${esc(x.year)}</div><div>${esc(en?x.en:x.vi)}<div class="source-inline">${x.sources.map(s=>`<button class="source-chip" data-source="${s}">${t('source')} ${s}</button>`).join('')}</div></div></div>`).join('');$('profileSections').innerHTML=profile.profileSections.map(x=>`<article class="profile-section"><h4>${esc(en?x.titleEn:x.title)}</h4><p>${esc(en?x.bodyEn:x.body)}</p>${x.evidenceType?`<p class="evidence-tag"><i>${esc(en?'Evidence class: ':'Phân loại chứng cứ: ')}${esc(x.evidenceType)}</i></p>`:''}<div class="source-inline">${x.sources.map(s=>`<button class="source-chip" data-source="${s}">${t('source')} ${s}</button>`).join('')}</div></article>`).join('');}
+function evidenceLabel(type=''){
+  const key=String(type||'').toLowerCase();
+  const isEn=state.lang==='en';
+  if(key.includes('simulation'))return isEn?'Simulation':'Mô phỏng';
+  if(key.includes('tradition')&&key.includes('disput'))return isEn?'Tradition and disputed point':'Truyền thuyết và điểm còn tranh luận';
+  if(key.includes('tradition'))return isEn?'Tradition':'Truyền thuyết';
+  if(key.includes('disput'))return isEn?'Disputed point':'Điểm còn tranh luận';
+  if(key.includes('interpret')||key.includes('author_judgement')||key.includes('reception'))return isEn?'Scholarly interpretation':'Nhận định nghiên cứu/sử gia';
+  if(key.includes('limit')||key.includes('uncertain'))return isEn?'Evidence limit':'Chưa đủ nguồn để khẳng định';
+  if(key.includes('chronicle'))return isEn?'Chronicle record':'Dữ kiện theo chính sử';
+  return isEn?'Historical evidence':'Dữ kiện lịch sử';
+}
+function renderProfile(){const en=state.lang==='en';$('profileStats').innerHTML=[[(en?'Years':'Năm'),en?(profile.yearsEn||profile.years):profile.years],[(en?'Polity':'Triều đại'),en?profile.dynastyEn:profile.dynasty],[(en?'Rule':'Trị vì'),en?(profile.reignEn||profile.reign):profile.reign],[(en?'Capital':'Kinh đô'),en?(profile.capitalEn||profile.capital):profile.capital]].map(([a,b])=>`<div class="stat"><small>${esc(a)}</small><b>${esc(b)}</b></div>`).join('');$('timeline').innerHTML=profile.timeline.map(x=>`<div class="timeline-item"><div class="timeline-year">${esc(x.year)}</div><div>${esc(en?x.en:x.vi)}<div class="source-inline">${x.sources.map(s=>`<button class="source-chip" data-source="${s}">${t('source')} ${s}</button>`).join('')}</div></div></div>`).join('');$('profileSections').innerHTML=profile.profileSections.map(x=>`<article class="profile-section"><h4>${esc(en?x.titleEn:x.title)}</h4><p>${esc(en?x.bodyEn:x.body)}</p>${x.evidenceType?`<p class="evidence-tag"><i>${esc(en?'Evidence category: ':'Phân loại: ')}${esc(evidenceLabel(x.evidenceType))}</i></p>`:''}<div class="source-inline">${x.sources.map(s=>`<button class="source-chip" data-source="${s}">${t('source')} ${s}</button>`).join('')}</div></article>`).join('');}
 function renderSources(){const en=state.lang==='en';$('sourcesList').innerHTML=profile.sources.map(s=>`<article class="source-card" id="src-${s.id}"><h4>${esc(en?s.titleEn:s.title)}</h4><p><b>${esc(en?s.orgEn:s.org)}</b></p><p>${esc(en?s.typeEn:s.type)}</p><a href="${esc(s.url)}" target="_blank" rel="noopener">${t('openSource')}</a></article>`).join('')}
 function renderSuggestions(){const en=state.lang==='en';const make=(arr,target,input)=>$(target).innerHTML=arr.map(x=>`<button class="chip" data-fill="${esc(x)}" data-input="${input}">${esc(x)}</button>`).join('');make(profile.qaSuggestions[en?'en':'vi'],'qaSuggestions','qaInput');make(profile.whatifSuggestions[en?'en':'vi'],'whatifSuggestions','whatifInput')}
 function renderGuide(){const items=state.lang==='vi'?['Kéo mô hình để xoay; chụm hoặc cuộn để phóng to.','Mở Hồ sơ để xem timeline và nguồn sử liệu.','Tra cứu sử liệu dùng kho dữ kiện đã biên tập.','Giả định lịch sử chỉ là mô phỏng nguyên nhân–hậu quả.','Nhập vai giúp cân nhắc quân sự, ngoại giao, lòng dân và hậu cần.']:['Drag the model to rotate; pinch or scroll to zoom.','Open Profile to inspect the timeline and sources.','Historical inquiry uses a curated evidence base.','Counterfactual analysis is a cause-and-effect learning simulation.','Role-play weighs military, diplomacy, public support and logistics.'];$('guideList').innerHTML=items.map(x=>`<li>${esc(x)}</li>`).join('')}
@@ -411,7 +493,7 @@ function playNarrationNow(){
     state.narrationShouldResume=true;
   });
 }
-function pauseNarration(remember=false){const a=narration();if(remember&&(!a.paused||state.narrationShouldResume))state.narrationShouldResume=true;a.pause()}
+function pauseNarration(remember=false){const a=narration();const wasPlaying=!a.paused;if(remember&&(wasPlaying||state.narrationShouldResume))state.narrationShouldResume=true;a.pause();if(wasPlaying&&state.mainStarted)void sendAnalyticsEvent('narration_pause',{feature:'Thuyết minh',metadata:{language:state.lang,currentTime:Math.round(a.currentTime||0)}})}
 function resumeNarration(){if(!state.audio||!state.narrationShouldResume)return;state.narrationShouldResume=false;narration().play().catch(()=>{})}
 function startMain(){state.sessionStart=Date.now();state.mainStarted=true;$('header').classList.remove('hidden');$('mainDock').classList.remove('hidden');$('utilityBar').classList.remove('hidden');state.journey.artifact=true;renderJourney();void sendAnalyticsEvent('character_open',{feature:'Hiện vật',content:profile?.name||''});if(state.audio){state.narrationShouldResume=false;beginNarrationAfterDust()}resetIdle()}
 function initDust(){const c=$('dustCanvas'),ctx=c.getContext('2d',{willReadFrequently:true});function size(){c.width=c.clientWidth;c.height=c.clientHeight;ctx.globalCompositeOperation='source-over';ctx.fillStyle='#6c5a45';ctx.fillRect(0,0,c.width,c.height);for(let i=0;i<150;i++){ctx.fillStyle=`rgba(30,25,20,${Math.random()*.18})`;ctx.beginPath();ctx.arc(Math.random()*c.width,Math.random()*c.height,Math.random()*28,0,Math.PI*2);ctx.fill()}}size();addEventListener('resize',()=>{if(!state.dustDone)size()});let drawing=false,last=null,started=false;const fade=()=>{if(started)return;started=true;$('dustInstruction').classList.add('is-fading')};function erase(x,y,rad=55){fade();ctx.globalCompositeOperation='destination-out';ctx.beginPath();ctx.arc(x,y,rad,0,Math.PI*2);ctx.fill();check()};function pos(e){const r=c.getBoundingClientRect(),p=e.touches?.[0]||e;return{x:p.clientX-r.left,y:p.clientY-r.top}}c.addEventListener('pointerdown',e=>{if(!state.brush)return;drawing=true;last=pos(e);erase(last.x,last.y)});c.addEventListener('pointermove',e=>{if(!drawing||!state.brush)return;const p=pos(e);erase(p.x,p.y,48);last=p});addEventListener('pointerup',()=>drawing=false);$('brushBtn').onclick=()=>{state.brush=true;fade();showToast(state.lang==='vi'?'Đã bật chế độ chổi.':'Brush mode enabled.')};$('skipDustBtn').onclick=()=>finishDust();let checks=0;const revealThreshold=48;function check(){if(++checks%5)return;const d=ctx.getImageData(0,0,c.width,c.height).data;let clear=0,total=d.length/4;for(let i=3;i<d.length;i+=4)if(d[i]<100)clear++;const rawPct=Math.min(100,Math.round(clear/total*100));const displayPct=Math.min(100,Math.round(rawPct/revealThreshold*100));$('dustProgressBar').style.width=displayPct+'%';$('dustProgressText').textContent=displayPct+'%';if(rawPct>=revealThreshold||displayPct>=100)finishDust()}navigator.mediaDevices?.getUserMedia({audio:true}).then(stream=>{state.dustStream=stream;const C=window.AudioContext||window.webkitAudioContext,ac=new C();state.dustAudioContext=ac;const an=ac.createAnalyser(),src=ac.createMediaStreamSource(stream);src.connect(an);an.fftSize=256;const arr=new Uint8Array(an.frequencyBinCount);let streak=0;function tick(){if(state.dustDone)return;an.getByteFrequencyData(arr);let avg=arr.reduce((a,b)=>a+b,0)/arr.length;if(avg>52){fade();streak++;for(let i=0;i<(streak>8?3:1);i++)erase(Math.random()*c.width,Math.random()*c.height,streak>8?78:58)}else streak=Math.max(0,streak-2);requestAnimationFrame(tick)}tick()}).catch(()=>{state.brush=true})}
@@ -437,7 +519,7 @@ async function sendQa(){
 
     state.qaCount++;state.questions.push(q);state.journey.qa=true;
     void sendAnalyticsEvent('ask_question',{feature:'Tra cứu sử liệu',content:q,metadata:{answerType:d.answerType||'',sourceIds:Array.isArray(d.sourceIds)?d.sourceIds:[]}});
-    $('qaResult').innerHTML=`<div class="result-block"><h4>${state.lang==='vi'?'Câu trả lời':'Answer'}</h4><p>${esc(d.reply||'')}</p>${d.answerType?`<p class="evidence-tag"><i>${esc(d.answerType)}</i></p>`:''}</div><div class="result-block"><h4>${state.lang==='vi'?'Dữ kiện hỗ trợ':'Supporting evidence'}</h4>${d.evidencePoints?.length?`<ul>${d.evidencePoints.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:`<p>${state.lang==='vi'?'Chưa đủ nguồn để khẳng định.':'Insufficient evidence to confirm.'}</p>`}</div><div class="result-block"><h4>${state.lang==='vi'?'Nguồn':'Sources'}</h4><div class="source-inline">${sourceButtons(d.sourceIds)}</div></div><div class="result-block"><h4>${state.lang==='vi'?'Ghi chú kiểm chứng':'Verification note'}</h4><p><i>${esc(d.evidenceNote||'')}</i></p></div>`;
+    $('qaResult').innerHTML=`<div class="result-block"><h4>${state.lang==='vi'?'Câu trả lời':'Answer'}</h4><p>${esc(d.reply||'')}</p></div><div class="result-block"><h4>${state.lang==='vi'?'Dữ kiện hỗ trợ':'Supporting evidence'}</h4>${d.evidencePoints?.length?`<ul>${d.evidencePoints.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:`<p>${state.lang==='vi'?'Chưa đủ nguồn để khẳng định.':'Insufficient evidence to confirm.'}</p>`}</div><div class="result-block"><h4>${state.lang==='vi'?'Nguồn':'Sources'}</h4><div class="source-inline">${sourceButtons(d.sourceIds)}</div></div><div class="result-block"><h4>${state.lang==='vi'?'Ghi chú kiểm chứng':'Verification note'}</h4><p><i>${esc(d.evidenceNote||'')}</i></p></div>`;
     $('qaStatus').textContent=t('done');renderJourney();
     void preparedSpeech.start();
   }catch(e){if(e?.name==='AbortError'||controller.signal.aborted)return;$('qaStatus').textContent=t('error')}
@@ -466,12 +548,7 @@ async function sendWhatif(){
 }
 function roleMetricLabel(value){
   const n=Number(value);
-  if(Number.isFinite(n)){
-    const score=Math.max(1,Math.min(5,Math.round(n)));
-    const vi={1:'Yếu',2:'Trung bình',3:'Khá',4:'Tốt',5:'Rất tốt'};
-    const en={1:'Weak',2:'Average',3:'Good',4:'Strong',5:'Excellent'};
-    return (state.lang==='vi'?vi:en)[score];
-  }
+  if(Number.isFinite(n))return roleMetricText(n,state.lang);
   const text=String(value??'').trim();
   return text|| (state.lang==='vi'?'Trung bình':'Average');
 }
@@ -541,6 +618,76 @@ async function roleTurn(choice=null){
 // Giữ tên speak() để các phần mã cũ tương thích, nhưng mặc định đọc tức thời.
 function speak(text){speakInstant(text)}
 function participantSnapshot(){return {name:state.name,className:state.className,school:state.school}}
+function createPdfStage(sheet){
+  const stage=document.createElement('div');
+  stage.className='pdf-export-stage';
+  stage.setAttribute('aria-hidden','true');
+  stage.appendChild(sheet);
+  document.body.appendChild(stage);
+  return stage;
+}
+function createRoleplayExportSheet(){
+  const sheet=document.createElement('section');
+  sheet.className='pdf-export-sheet';
+  sheet.lang=state.lang;
+  sheet.innerHTML=buildRoleplayWorksheetMarkup({profile,participant:participantSnapshot(),history:state.roleHistory,lang:state.lang});
+  return sheet;
+}
+function createSummaryExportSheet(){
+  const sheet=document.createElement('section');
+  sheet.className='pdf-export-sheet pdf-summary-sheet';
+  sheet.lang=state.lang;
+  sheet.innerHTML=$('summaryPrintable').innerHTML;
+  return sheet;
+}
+async function savePdfSheet(sheet,filename){
+  if(typeof window.html2pdf!=='function')throw new Error('PDF library unavailable');
+  const stage=createPdfStage(sheet);
+  try{
+    if(document.fonts?.ready)await document.fonts.ready;
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    await html2pdf().set({
+      margin:[.42,.45,.42,.45],
+      filename,
+      pagebreak:{mode:['css','legacy']},
+      image:{type:'jpeg',quality:.98},
+      html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false},
+      jsPDF:{unit:'in',format:'a4',orientation:'portrait'}
+    }).from(sheet).save();
+  }finally{stage.remove()}
+}
+async function exportRoleplayPdf(){
+  const button=$('roleExportBtn');
+  if(button.disabled)return;
+  const original=button.textContent;
+  button.disabled=true;
+  button.textContent=state.lang==='vi'?'Đang tạo PDF…':'Creating PDF…';
+  const filename=`Nhap_vai_${profile.id}.pdf`;
+  try{
+    await savePdfSheet(createRoleplayExportSheet(),filename);
+    void sendAnalyticsEvent('pdf_export',{feature:'Nhập vai quyết sách',content:filename});
+    showToast(state.lang==='vi'?'Đã tải phiếu học tập PDF.':'The PDF worksheet was downloaded.');
+  }catch(e){
+    console.error('Role-play PDF export failed',e);
+    showToast(state.lang==='vi'?'Không thể tạo PDF. Hãy thử lại.':'Could not create the PDF. Please try again.');
+  }finally{button.disabled=false;button.textContent=original}
+}
+async function exportSummaryPdf(){
+  const button=$('summaryPdfBtn');
+  if(button.disabled)return;
+  const original=button.textContent;
+  button.disabled=true;
+  button.textContent=state.lang==='vi'?'Đang tạo PDF…':'Creating PDF…';
+  const filename=`Tong_ket_${profile.id}.pdf`;
+  try{
+    await savePdfSheet(createSummaryExportSheet(),filename);
+    void sendAnalyticsEvent('pdf_export',{feature:'Tổng kết',content:filename});
+    showToast(state.lang==='vi'?'Đã tải PDF tổng kết.':'The summary PDF was downloaded.');
+  }catch(e){
+    console.error('Summary PDF export failed',e);
+    showToast(state.lang==='vi'?'Không thể tạo PDF. Hãy thử lại.':'Could not create the PDF. Please try again.');
+  }finally{button.disabled=false;button.textContent=original}
+}
 function showSummary(){const sec=state.sessionStart?Math.round((Date.now()-state.sessionStart)/1000):0,m=Math.floor(sec/60),s=sec%60,participant=[state.name,state.className,state.school].filter(Boolean).join(' • ');$('summarySub').textContent=`${participant} • ${m}:${String(s).padStart(2,'0')}`;$('summaryStats').innerHTML=[[state.lang==='vi'?'Thời gian':'Time',`${m}:${String(s).padStart(2,'0')}`],[t('qa'),state.qaCount],[t('whatif'),state.whatifCount],[t('role'),state.roleCount]].map(([a,b])=>`<div class="summary-card"><small>${esc(a)}</small><b>${esc(b)}</b></div>`).join('');$('summaryJourney').innerHTML=$('journeyList').innerHTML;openPanel('summaryPanel')}
 function resetCamera(){$('historyModel').cameraOrbit='0deg 75deg 105%';$('historyModel').cameraTarget='auto auto auto'}
 function changeLang(){const from=state.lang;stopCurrentAIWork();pauseNarration(false);state.lang=state.lang==='vi'?'en':'vi';void sendAnalyticsEvent('language_change',{feature:'Ngôn ngữ',content:`${from}->${state.lang}`,metadata:{from,to:state.lang}});warmSpeechVoices();qsa('.result-card').forEach(x=>{x.dataset.filled='';x.innerHTML=''});renderAll();if(state.mainStarted&&state.audio&&!qsa('.panel').some(p=>!p.classList.contains('hidden')))narration().play().catch(()=>{})}
@@ -548,26 +695,7 @@ function setupMic(btnId,inputId){const SR=window.SpeechRecognition||window.webki
 function resetIdle(){clearTimeout(state.idleTimer);if(CFG.ENABLE_KIOSK_RESET!==false)state.idleTimer=setTimeout(()=>{void endAnalyticsSession('idle_reset');setTimeout(()=>location.reload(),80)},Number(CFG.KIOSK_IDLE_MS||180000))}
 ['pointerdown','keydown','touchstart'].forEach(ev=>addEventListener(ev,resetIdle,{passive:true}));
 qsa('[data-panel]').forEach(b=>b.addEventListener('click',()=>openPanel(b.dataset.panel)));qsa('.panel-close').forEach(b=>b.addEventListener('click',closePanels));$('backdrop').onclick=closePanels;document.addEventListener('click',e=>{const s=e.target.closest('[data-source]');if(s){openPanel('sourcesPanel');setTimeout(()=>document.getElementById('src-'+s.dataset.source)?.scrollIntoView({behavior:'smooth',block:'center'}),100)}const f=e.target.closest('[data-fill]');if(f)$(f.dataset.input).value=f.dataset.fill});
-$('startBtn').onclick=()=>{const name=$('playerName').value.trim();if(!name){$('participantError').textContent=t('nameRequired');$('playerName').focus();$('playerName').setAttribute('aria-invalid','true');return}$('participantError').textContent='';$('playerName').removeAttribute('aria-invalid');primeInstantSpeech();state.name=name;state.className=$('playerClass').value.trim();state.school=$('playerSchool').value.trim();startAnalyticsSession();unlockNarrationAudio();$('intro').classList.add('hidden');$('dustScreen').classList.remove('hidden');initDust()};$('introLangBtn').onclick=changeLang;$('langBtn').onclick=changeLang;$('resetCameraBtn').onclick=resetCamera;$('audioBtn').onclick=()=>{state.audio=!state.audio;setAudioButtonState();if(!state.audio){$('narrationVi').pause();$('narrationEn').pause();$('narrationVi').loop=false;$('narrationEn').loop=false;stopAIResponseAudio()}else if(state.mainStarted&&qsa('.panel').every(p=>p.classList.contains('hidden'))){state.narrationShouldResume=false;playNarrationNow()}};$('qaSendBtn').onclick=sendQa;$('whatifSendBtn').onclick=sendWhatif;$('roleStartBtn').onclick=startNewRoleScenario;$('journeySummaryBtn').onclick=showSummary;$('finishBtn').onclick=()=>{void endAnalyticsSession('finish');showSummary()};$('summaryPdfBtn').onclick=()=>{if(window.html2pdf)html2pdf().set({margin:.5,filename:`Tong_ket_${profile.id}.pdf`,html2canvas:{scale:2},jsPDF:{unit:'in',format:'a4',orientation:'portrait'}}).from($('summaryPrintable')).save()};$('roleExportBtn').onclick=()=>{
-  if(!window.html2pdf)return;
-  const source=$('roleplayPanel');
-  if(!source)return;
-  const clone=source.cloneNode(true);
-  clone.id='roleplayExportTemp';
-  clone.classList.remove('hidden');
-  clone.style.position='fixed';
-  clone.style.left='-10000px';
-  clone.style.top='0';
-  clone.style.width='794px';
-  clone.style.background='#fff';
-  clone.style.color='#111';
-  clone.style.height='auto';
-  clone.querySelectorAll('button').forEach(b=>b.remove());
-  document.body.appendChild(clone);
-  requestAnimationFrame(()=>{
-    html2pdf().set({margin:.5,filename:`Nhap_vai_${profile.id}.pdf`,html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false},jsPDF:{unit:'in',format:'a4',orientation:'portrait'}}).from(clone).save().then(()=>clone.remove()).catch(()=>clone.remove());
-  });
-};$('newSessionBtn').onclick=()=>{void endAnalyticsSession('new_session');setTimeout(()=>location.reload(),80)};setupMic('qaMicBtn','qaInput');setupMic('whatifMicBtn','whatifInput');['playerName','playerClass','playerSchool'].forEach(id=>$(id).addEventListener('input',()=>{if(id==='playerName'&&$(id).value.trim()){$('participantError').textContent='';$(id).removeAttribute('aria-invalid')}}));$('playerName').addEventListener('keydown',e=>{if(e.key==='Enter')$('startBtn').click()});
+$('startBtn').onclick=()=>{const name=$('playerName').value.trim();if(!name){$('participantError').textContent=t('nameRequired');$('playerName').focus();$('playerName').setAttribute('aria-invalid','true');return}$('participantError').textContent='';$('playerName').removeAttribute('aria-invalid');primeInstantSpeech();state.name=name;state.className=$('playerClass').value.trim();state.school=$('playerSchool').value.trim();startAnalyticsSession();unlockNarrationAudio();$('intro').classList.add('hidden');$('dustScreen').classList.remove('hidden');initDust()};$('introLangBtn').onclick=changeLang;$('langBtn').onclick=changeLang;$('resetCameraBtn').onclick=resetCamera;$('audioBtn').onclick=()=>{state.audio=!state.audio;setAudioButtonState();if(!state.audio){$('narrationVi').pause();$('narrationEn').pause();$('narrationVi').loop=false;$('narrationEn').loop=false;stopAIResponseAudio()}else if(state.mainStarted&&qsa('.panel').every(p=>p.classList.contains('hidden'))){state.narrationShouldResume=false;playNarrationNow()}};$('qaSendBtn').onclick=sendQa;$('whatifSendBtn').onclick=sendWhatif;$('roleStartBtn').onclick=startNewRoleScenario;$('journeySummaryBtn').onclick=showSummary;$('finishBtn').onclick=()=>{void endAnalyticsSession('finish');showSummary()};$('summaryPdfBtn').onclick=exportSummaryPdf;$('roleExportBtn').onclick=exportRoleplayPdf;$('newSessionBtn').onclick=()=>{void endAnalyticsSession('new_session');setTimeout(()=>location.reload(),80)};setupMic('qaMicBtn','qaInput');setupMic('whatifMicBtn','whatifInput');['playerName','playerClass','playerSchool'].forEach(id=>$(id).addEventListener('input',()=>{if(id==='playerName'&&$(id).value.trim()){$('participantError').textContent='';$(id).removeAttribute('aria-invalid')}}));$('playerName').addEventListener('keydown',e=>{if(e.key==='Enter')$('startBtn').click()});
 addEventListener('pagehide',()=>{void endAnalyticsSession('pagehide')},{capture:true});
 const model=$('historyModel');model.addEventListener('load',()=>{$('modelState').classList.add('hidden')});model.addEventListener('error',()=>{$('modelStateTitle').textContent=t('modelError');$('retryModelBtn').classList.remove('hidden')});$('retryModelBtn').onclick=()=>{model.src='';setTimeout(()=>model.src=profile.model,50)};
 fetch(API+'/health').then(r=>r.ok?r.json():Promise.reject()).then(()=>{$('connectionBadge').textContent=t('connected');$('connectionBadge').className='connection ok'}).catch(()=>{$('connectionBadge').textContent=t('offline');$('connectionBadge').className='connection bad'});

@@ -36,6 +36,37 @@ function curatedContext(p,lang='vi'){
   const noEvidence=en?'Insufficient evidence to confirm.':'Chưa đủ nguồn để khẳng định.';
   return `${en?'HISTORICAL FIGURE':'NHÂN VẬT'}: ${en?p.nameEn:p.name}\n${en?'CURATED FACTS':'DỮ KIỆN NỀN ĐÃ BIÊN TẬP'}:\n${facts}\n${en?'ALLOWED SOURCE IDS':'MÃ NGUỒN ĐƯỢC PHÉP'}:\n${sources}\n${en?'RULES':'QUY TẮC'}:\n- ${en?'Use only the curated facts above as historical background. Do not use memory or outside knowledge.':'Chỉ dùng các dữ kiện nền ở trên làm bối cảnh lịch sử. Không dùng trí nhớ hoặc kiến thức ngoài bộ facts.'}\n- ${en?'Every historical statement must be supported by one or more listed source IDs.':'Mỗi phát biểu lịch sử phải được hỗ trợ bởi ít nhất một sourceId trong danh sách.'}\n- ${en?'Keep historical fact, author judgement, legend, disputed point and simulation distinct.':'Phân biệt rõ dữ kiện lịch sử, nhận định tác giả, truyền thuyết, điểm tranh luận và mô phỏng.'}\n- ${en?'When the facts do not support a claim, write exactly: '+noEvidence:'Khi facts không đủ hỗ trợ, phải ghi đúng câu: '+noEvidence}\n- ${en?'Never invent dates, places, offices, quotations, figures, page numbers, issue numbers or URLs.':'Không bịa niên đại, địa danh, chức vụ, trích dẫn, số liệu, số trang, số tạp chí hoặc URL.'}`;
 }
+function roleIdentityPrompt(rp={},lang='vi'){
+  const en=lang==='en';
+  const learner=rp.learnerRole?.[lang]||'';
+  const npc=rp.npcRole?.[lang]||'';
+  const address=rp.addressRule?.[lang]||'';
+  return `${en?'ROLE LOCK - NEVER SWAP THESE ROLES':'KHÓA VAI - TUYỆT ĐỐI KHÔNG ĐẢO VAI'}:\n- ${en?'Human learner':'Người học'}: ${learner}\n- ${en?'AI/NPC':'AI/NPC'}: ${npc}\n- ${en?'Address rule':'Quy tắc xưng hô'}: ${address}\n- ${en?'npcDialogue contains only the NPC words addressed to the human learner. feedback is a neutral facilitator comment. Never write the learner response for them.':'npcDialogue chỉ chứa lời của NPC nói với người học. feedback là nhận xét trung lập của người hướng dẫn. Không viết thay câu trả lời của người học.'}`;
+}
+function normalizeRoleResponse(value={}){
+  const d=value&&typeof value==='object'?value:{};
+  d.npcDialogue=clean(typeof d.npcDialogue==='string'?d.npcDialogue:(d.npcDialogue?.text||d.npcDialogue?.dialogue||''),4000);
+  d.feedback=clean(typeof d.feedback==='string'?d.feedback:(d.feedback?.text||d.feedback?.comment||''),2500);
+  d.endReason=clean(typeof d.endReason==='string'?d.endReason:(d.endReason?.text||d.endReason?.reason||''),2500);
+  return d;
+}
+function roleIdentityViolation(rp={},lang='vi',response={}){
+  const dialogue=String(response.npcDialogue||'').toLocaleLowerCase(lang==='vi'?'vi-VN':'en-US');
+  const forbidden=rp.identityGuard?.forbiddenNpcPhrases?.[lang]||[];
+  return forbidden.some(phrase=>dialogue.includes(String(phrase).toLocaleLowerCase(lang==='vi'?'vi-VN':'en-US')));
+}
+function lastRoleEvaluation(history=[]){
+  for(let i=(Array.isArray(history)?history.length:0)-1;i>=0;i--){
+    const item=history[i];
+    if(item?.role!=='assistant')continue;
+    try{
+      const data=typeof item.content==='string'?JSON.parse(item.content):item.content;
+      if(data?.evaluation&&typeof data.evaluation==='object')return data.evaluation;
+    }catch{}
+  }
+  return {};
+}
+function booleanValue(value){return value===true||String(value).toLowerCase()==='true'}
 async function jsonChat(messages,temp=.35){
   if(!openai)throw new Error('OPENAI_API_KEY missing');
   const r=await openai.chat.completions.create({
@@ -122,7 +153,9 @@ app.post('/ask',async(req,res)=>{
     const prompt=`${curatedContext(p,lang)}\n${lang==='en'?'Answer entirely in English.':'Trả lời hoàn toàn bằng tiếng Việt.'}\nYou are a source-locked historical inquiry assistant. Return JSON exactly with keys: answerType, reply, evidencePoints (array), sourceIds (array), evidenceNote, confidence, suggestions (array). The reply is the main answer and must be understandable on its own. Evidence points must not add facts absent from the curated set. If the question is counterfactual, direct the learner to the counterfactual tool. Do not include headings inside reply.`;
     const d=await jsonChat([{role:'system',content:prompt},{role:'user',content:q}],.25);
     d.sourceIds=filterSourceIds(p,d.sourceIds);
-    d.evidencePoints=Array.isArray(d.evidencePoints)?d.evidencePoints.slice(0,6):[];
+    d.reply=clean(typeof d.reply==='string'?d.reply:(d.reply?.text||d.reply?.answer||''),5000);
+    d.evidenceNote=clean(typeof d.evidenceNote==='string'?d.evidenceNote:(d.evidenceNote?.text||''),2000);
+    d.evidencePoints=Array.isArray(d.evidencePoints)?d.evidencePoints.map(x=>clean(typeof x==='string'?x:(x?.text||x?.point||''),1000)).filter(Boolean).slice(0,6):[];
     d.suggestions=Array.isArray(d.suggestions)?d.suggestions.slice(0,4):[];
     res.json(d);
   }catch(e){res.status(500).json({message:lang==='en'?'AI inquiry is unavailable.':'Tra cứu AI đang tạm gián đoạn.'})}
@@ -137,7 +170,10 @@ app.post('/whatif',async(req,res)=>{
     const prompt=`${curatedContext(p,lang)}\n${lang==='en'?'Write entirely in English.':'Viết hoàn toàn bằng tiếng Việt.'}\nGuide counterfactual historical thinking. Return JSON exactly with keys: baseline, sourceIds, changedAssumption, consequences (array of 3-5 strings), uncertainty, suggestions (array). The four displayed sections are: historical baseline, changed condition, possible consequences, uncertainty. The baseline alone is factual and requires sourceIds. Changed assumptions and consequences are simulations and must be phrased conditionally. Never give fabricated success rates, casualty percentages, troop counts or other invented quantitative predictions.`;
     const d=await jsonChat([{role:'system',content:prompt},...hist(req.body.history),{role:'user',content:scenario}],.45);
     d.sourceIds=filterSourceIds(p,d.sourceIds);
-    d.consequences=Array.isArray(d.consequences)?d.consequences.slice(0,5):[];
+    d.baseline=clean(typeof d.baseline==='string'?d.baseline:(d.baseline?.text||''),3000);
+    d.changedAssumption=clean(typeof d.changedAssumption==='string'?d.changedAssumption:(d.changedAssumption?.text||''),3000);
+    d.uncertainty=clean(typeof d.uncertainty==='string'?d.uncertainty:(d.uncertainty?.text||''),3000);
+    d.consequences=Array.isArray(d.consequences)?d.consequences.map(x=>clean(typeof x==='string'?x:(x?.text||x?.consequence||''),1200)).filter(Boolean).slice(0,5):[];
     d.suggestions=Array.isArray(d.suggestions)?d.suggestions.slice(0,4):[];
     res.json(d);
   }catch(e){res.status(500).json({message:lang==='en'?'Counterfactual analysis is unavailable.':'Phân tích giả định đang tạm gián đoạn.'})}
@@ -151,36 +187,39 @@ app.post('/roleplay',async(req,res)=>{
   try{
     const rp=p.roleplay||{};
     const en=lang==='en';
-    const prompt=`${curatedContext(p,lang)}\n${en?'Write entirely in English.':'Viết hoàn toàn bằng tiếng Việt.'}\nHISTORICAL DECISION ROLE-PLAY. ${en?rp.learnerRole?.en:rp.learnerRole?.vi}\nSETTING: ${en?rp.setting?.en:rp.setting?.vi}\nOPENING PROBLEM: ${en?rp.opening?.en:rp.opening?.vi}\nFACTORS: ${(en?rp.evaluationFactors?.en:rp.evaluationFactors?.vi||[]).join(', ')}\nRULES: ${en?rp.rules?.en:rp.rules?.vi}\nThis is turn ${turn}/${maxTurns}. Return JSON exactly with keys: npcDialogue, feedback, evaluation (object with military, diplomacy, publicSupport, logistics, politics, governance), sourceIds, choices, isGameOver, endReason. Every evaluation value must be an integer from 1 to 5 and is only a SIMULATION INDICATOR, never a historical fact. On turn 1 use the configured baseline evaluation exactly. On later turns, change scores only when justified by the learner's simulated choice and normally by at most 1 point per factor. Source IDs may support only real background stated in npcDialogue or feedback; never attach historical sources to the simulated scores themselves. Clearly label simulated consequences as simulation. Unless game over, choices must contain exactly 3 distinct actionable options. End no later than turn ${maxTurns}.`;
-    const d=await jsonChat([{role:'system',content:prompt},...hist(req.body.history)],.55);
-    d.sourceIds=filterSourceIds(p,d.sourceIds);
     const defaultEvaluation={military:3,diplomacy:2,publicSupport:4,logistics:2,politics:3,governance:2};
     const configuredEvaluation=rp.initialEvaluation&&typeof rp.initialEvaluation==='object'?rp.initialEvaluation:{};
     const baselineEvaluation=Object.fromEntries(Object.keys(defaultEvaluation).map(k=>[k,Number.isFinite(Number(configuredEvaluation[k]))?Math.max(1,Math.min(5,Math.round(Number(configuredEvaluation[k])))):defaultEvaluation[k]]));
+    const prompt=`${curatedContext(p,lang)}\n${en?'Write entirely in English.':'Viết hoàn toàn bằng tiếng Việt.'}\n${roleIdentityPrompt(rp,lang)}\nHISTORICAL DECISION ROLE-PLAY.\nSETTING: ${en?rp.setting?.en:rp.setting?.vi}\nOPENING PROBLEM: ${en?rp.opening?.en:rp.opening?.vi}\nFACTORS: ${(en?rp.evaluationFactors?.en:rp.evaluationFactors?.vi||[]).join(', ')}\nBASELINE EVALUATION: ${JSON.stringify(baselineEvaluation)}\nRULES: ${en?rp.rules?.en:rp.rules?.vi}\nThis is turn ${turn}/${maxTurns}. Return JSON exactly with keys: npcDialogue, feedback, evaluation (object with military, diplomacy, publicSupport, logistics, politics, governance), sourceIds, choices, isGameOver, endReason. Every evaluation value must be an integer from 1 to 5 and is only a SIMULATION INDICATOR, never a historical fact. On turn 1 use the configured baseline evaluation exactly. On later turns, change scores only when justified by the learner's simulated choice and normally by at most 1 point per factor. Source IDs may support only real background stated in npcDialogue or feedback; never attach historical sources to the simulated scores themselves. Clearly label simulated consequences as simulation. Unless game over, choices must contain exactly 3 distinct actionable options. End no later than turn ${maxTurns}.`;
+    const messages=[{role:'system',content:prompt},...hist(req.body.history)];
+    let d=normalizeRoleResponse(await jsonChat(messages,.42));
+    if(roleIdentityViolation(rp,lang,d)){
+      const correction=en?'Your previous JSON swapped the learner and NPC roles. Regenerate it now with the ROLE LOCK obeyed. Return only the corrected JSON.':'JSON trước đã đảo vai người học và NPC. Hãy tạo lại, tuân thủ tuyệt đối KHÓA VAI và chỉ trả JSON đã sửa.';
+      d=normalizeRoleResponse(await jsonChat([...messages,{role:'assistant',content:JSON.stringify(d)},{role:'user',content:correction}],.15));
+    }
+    if(roleIdentityViolation(rp,lang,d))d.npcDialogue=clean(rp.identityGuard?.fallbackNpcDialogue?.[lang]||(en?'Consider the three options below.':'Hãy cân nhắc ba phương án dưới đây.'),4000);
+    d.sourceIds=filterSourceIds(p,d.sourceIds);
     const normalizeScore=v=>{const n=Number(v);return Number.isFinite(n)?Math.max(1,Math.min(5,Math.round(n))):3};
     if(turn===1){
       d.evaluation={...baselineEvaluation};
     }else{
       const raw=d.evaluation&&typeof d.evaluation==='object'?d.evaluation:{};
-      d.evaluation=Object.fromEntries(Object.keys(baselineEvaluation).map(k=>[k,normalizeScore(raw[k]) ]));
+      const previousRaw=lastRoleEvaluation(req.body.history);
+      d.evaluation=Object.fromEntries(Object.keys(baselineEvaluation).map(k=>{
+        const previous=normalizeScore(previousRaw[k]??baselineEvaluation[k]);
+        const proposed=normalizeScore(raw[k]??previous);
+        return [k,Math.max(previous-1,Math.min(previous+1,proposed))];
+      }));
     }
-    if(turn>=maxTurns)d.isGameOver=true;
+    d.isGameOver=booleanValue(d.isGameOver)||turn>=maxTurns;
     if(d.isGameOver)d.choices=[];
     else{
-      d.choices = Array.isArray(d.choices)
-        ? d.choices
-            .map(c => {
-              if (typeof c === 'string') return c.trim();
-              if (c && typeof c === 'object') {
-                return clean(c.text || c.label || c.choice || c.action || c.title || '', 500);
-              }
-              return '';
-            })
-            .filter(Boolean)
-            .slice(0, 3)
-        : [];
-      while(d.choices.length<3)d.choices.push(en?`Reassess the situation before action ${d.choices.length+1}`:`Đánh giá lại tình hình trước phương án ${d.choices.length+1}`);
+      const normalized=Array.isArray(d.choices)?d.choices.map(c=>typeof c==='string'?clean(c,500):clean(c?.text||c?.label||c?.choice||c?.action||c?.title||'',500)).filter(Boolean):[];
+      d.choices=[...new Set(normalized)].slice(0,3);
+      const fallback=en?['Coordinate the local leaders before acting.','Secure food, transport and communications.','Consult communities and reassess the risks.']:['Phối hợp các thủ lĩnh địa phương trước khi hành động.','Củng cố lương thực, vận chuyển và liên lạc.','Tham vấn cộng đồng rồi đánh giá lại rủi ro.'];
+      for(const choice of fallback)if(d.choices.length<3&&!d.choices.includes(choice))d.choices.push(choice);
     }
+    if(d.isGameOver&&!d.endReason)d.endReason=en?'The simulation has reached its final turn. Review how the choices affected each indicator.':'Mô phỏng đã đến lượt cuối. Hãy đối chiếu cách các lựa chọn tác động đến từng chỉ số.';
     res.json(d);
   }catch(e){res.status(500).json({message:lang==='en'?'Role-play is unavailable.':'Nhập vai đang tạm gián đoạn.'})}
 });

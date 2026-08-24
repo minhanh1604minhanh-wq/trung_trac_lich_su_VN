@@ -1,5 +1,5 @@
-MẪU CHUYỂN NHÂN VẬT TIẾP THEO
+PROMPT NÀY ĐÃ ĐƯỢC THAY THẾ.
 
-Dùng ZIP FULL Trưng Trắc này làm mẫu. Giữ nguyên giao diện, SVG, animation, màn bụi, 3D, responsive, audio, microphone, PDF, backend Express và Vercel. Chỉ thay nội dung/asset phụ thuộc nhân vật.
+Sử dụng file: PROMPT_MASTER_WEBSITE_NHAN_VAT_LICH_SU_v5.8.5.md
 
-Bắt buộc khóa AI vào facts có sourceId; phân biệt dữ kiện, nhận định, truyền thuyết, tranh luận và mô phỏng; xóa mọi hard-code của nhân vật trước; không đóng gói API key.
+Phiên bản mới bổ sung khóa vai AI/NPC, phiếu PDF dựng từ toàn bộ lịch sử lượt, thư viện PDF cục bộ, tốc độ đọc 1.12× và quy trình render PDF để kiểm tra trang trắng/cắt lề.
